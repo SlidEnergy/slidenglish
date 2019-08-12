@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <AssemblyName>SlidEnglish.IntegrationTests</AssemblyName>
+
+    <RootNamespace>SlidEnglish.IntegrationTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.2.6" />
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SlidEnglish.App\SlidEnglish.App.csproj" />
+    <ProjectReference Include="..\..\SlidEnglish.Domain\SlidEnglish.Domain.csproj" />
+    <ProjectReference Include="..\..\SlidEnglish.Infrastructure\SlidEnglish.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\SlidEnglish.Web\SlidEnglish.Web.csproj" />
+  </ItemGroup>
+
+</Project>
