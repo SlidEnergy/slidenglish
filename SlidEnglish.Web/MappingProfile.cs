@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SlidFinance.App;
+using SlidEnglish.App;
 using SlidEnglish.Domain;
 using SlidEnglish.Infrastructure;
 using System.Linq;

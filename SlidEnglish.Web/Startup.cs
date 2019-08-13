@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SlidEnglish.Domain;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 
 namespace SlidEnglish.Web
 {
@@ -109,6 +110,12 @@ namespace SlidEnglish.Web
 			services.AddCors();
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+			// In production, the Angular files will be served from this directory
+			services.AddSpaStaticFiles(configuration =>
+			{
+				configuration.RootPath = "ClientApp/dist";
+			});
+
 			services.AddEntityFrameworkNpgsql()
 				.AddDbContext<ApplicationDbContext>(options => options
 					.UseLazyLoadingProxies()
@@ -118,7 +125,7 @@ namespace SlidEnglish.Web
 			// Register the Swagger generator, defining 1 or more Swagger documents
 			services.AddSwaggerGen(c =>
 			{
-				c.SwaggerDoc("v1", new Info { Title = "SlidFinance", Version = "v1" });
+				c.SwaggerDoc("v1", new Info { Title = "SlidEnglish", Version = "v1" });
 				c.AddSecurityDefinition("Oauth2", new OAuth2Scheme
 				{
 					Type = "oauth2",
@@ -167,6 +174,7 @@ namespace SlidEnglish.Web
 
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
+			app.UseSpaStaticFiles();
 			app.UseAuthentication();
 			app.UseHttpsRedirection();
 
@@ -184,6 +192,19 @@ namespace SlidEnglish.Web
 			});
 
 			app.UseMvc();
+
+			app.UseSpa(spa =>
+			{
+				// To learn more about options for serving an Angular SPA from ASP.NET Core,
+				// see https://go.microsoft.com/fwlink/?linkid=864501
+
+				spa.Options.SourcePath = "ClientApp";
+
+				if (env.IsDevelopment())
+				{
+					spa.UseAngularCliServer(npmScript: "start");
+				}
+			});
 		}
 	}
 }

@@ -11,16 +11,18 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
+	  "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "SlidFinanceServer": {
+    "SlidEnglish.Web": {
       "commandName": "Project",
+	  "launchBrowser": true,
+	  "applicationUrl": "https://localhost:6001;http://localhost:6000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost:6001;http://localhost:6000"
+      }
     }
   }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SlidFinance.App.Utils
+namespace SlidEnglish.App.Utils
 {
 	public static class ArgumentValidator
 	{

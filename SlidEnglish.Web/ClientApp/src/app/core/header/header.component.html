@@ -1,0 +1,67 @@
+<mat-toolbar color="primary">
+   <mat-toolbar-row>
+      <span class="title">Slid Finance</span>
+      <span class="user-info"
+            *ngIf="isLoggedIn | async">{{(currentUser | async)?.userName}}</span>
+      <span class="spacer"></span>
+      <button mat-icon-button
+              fxShow="true"
+              fxHide.gt-sm
+              [matMenuTriggerFor]="appMenu">
+         <mat-icon>more_vert</mat-icon>
+      </button>
+      <div fxShow="true"
+           fxHide.lt-md>
+         <a mat-button
+            *ngIf="isLoggedIn | async"
+            routerLink="/statictics/category">Статистика по категориям</a>
+         <a mat-button
+            *ngIf="isLoggedIn | async"
+            routerLink="/banks/categories">Категории</a>
+         <a mat-button
+            *ngIf="isLoggedIn | async"
+            routerLink="/banks/rules">Правила</a>
+         <a mat-button
+            *ngIf="isLoggedIn | async"
+            routerLink="/banks">Мои банки</a>
+         <a mat-button
+            *ngIf="isLoggedIn | async"
+            routerLink="/banks/transactions">Траты</a>
+         <a mat-button
+            *ngIf="!(isLoggedIn | async)"
+            routerLink="/entry/register">Регистрация</a>
+         <a mat-button
+            *ngIf="!(isLoggedIn | async)"
+            routerLink="/entry/login">Вход</a>
+         <a mat-button
+            *ngIf="isLoggedIn | async"
+            (click)="logout()">Выход</a>
+      </div>
+   </mat-toolbar-row>
+</mat-toolbar>
+<mat-menu #appMenu="matMenu">
+   <a mat-menu-item
+      *ngIf="isLoggedIn | async"
+      routerLink="/statictics/category">Статистика по категориям</a>
+   <a mat-menu-item
+      *ngIf="isLoggedIn | async"
+      routerLink="/banks/categories">Категории</a>
+   <a mat-menu-item
+      *ngIf="isLoggedIn | async"
+      routerLink="/banks/rules">Правила</a>
+   <a mat-menu-item
+      *ngIf="isLoggedIn | async"
+      routerLink="/banks">Мои банки</a>
+   <a mat-menu-item
+      *ngIf="isLoggedIn | async"
+      routerLink="/banks/transactions">Траты</a>
+   <a mat-menu-item
+      *ngIf="!(isLoggedIn | async)"
+      routerLink="/entry/register">Регистрация</a>
+   <a mat-menu-item
+      *ngIf="!(isLoggedIn | async)"
+      routerLink="/entry/login">Вход</a>
+   <a mat-menu-item
+      *ngIf="isLoggedIn | async"
+      (click)="logout()">Выход</a>
+</mat-menu>
