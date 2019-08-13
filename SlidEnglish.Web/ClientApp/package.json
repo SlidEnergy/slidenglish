@@ -9,7 +9,8 @@
     "build:ssr": "ng run SlidEnglish:server:dev",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "generate-api": "swagger-codegen-cli generate -i http://localhost:6000/swagger/v1/swagger.json -l typescript-angular -o ./src/app/api -c ./openapi.json --remove-operation-id-prefix --type-mappings Date=Date --additional-properties ngVersion=8.0.0"
   },
   "private": true,
   "dependencies": {
@@ -40,6 +41,7 @@
     "@angular-devkit/build-angular": "^0.12.4",
     "@angular/compiler-cli": "^7.2.15",
     "@angular/language-service": "^7.2.15",
+    "@openapitools/openapi-generator-cli": "0.0.16-4.1.0",
     "@types/jasmine": "~3.3.7",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~10.12.18",
@@ -52,6 +54,7 @@
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
     "protractor": "~5.4.0",
+    "swagger-nodegen-cli": "^2.4.4",
     "ts-node": "^8.0.3",
     "tslint": "~5.12.1",
     "typescript": "~3.2.4"

@@ -11,7 +11,9 @@
  */
 
 
-export interface LoginBindingModel { 
-    email: string;
-    password: string;
+export interface Word { 
+    id?: number;
+    text: string;
+    association?: string;
+    description?: string;
 }
