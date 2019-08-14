@@ -110,12 +110,6 @@ namespace SlidEnglish.Web
 			services.AddCors();
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-			// In production, the Angular files will be served from this directory
-			services.AddSpaStaticFiles(configuration =>
-			{
-				configuration.RootPath = "ClientApp/dist";
-			});
-
 			services.AddEntityFrameworkNpgsql()
 				.AddDbContext<ApplicationDbContext>(options => options
 					.UseLazyLoadingProxies()
@@ -174,7 +168,6 @@ namespace SlidEnglish.Web
 
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
-			app.UseSpaStaticFiles();
 			app.UseAuthentication();
 
 			if (env.IsProduction())
@@ -196,19 +189,6 @@ namespace SlidEnglish.Web
 			});
 
 			app.UseMvc();
-
-			app.UseSpa(spa =>
-			{
-				// To learn more about options for serving an Angular SPA from ASP.NET Core,
-				// see https://go.microsoft.com/fwlink/?linkid=864501
-
-				spa.Options.SourcePath = "ClientApp";
-
-				if (env.IsDevelopment())
-				{
-					spa.UseAngularCliServer(npmScript: "start");
-				}
-			});
 		}
 	}
 }
