@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SlidEnglish.App;
 using SlidEnglish.Domain;
@@ -23,6 +24,7 @@ namespace SlidEnglish.Web
         [HttpGet("current")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
+		[Authorize]
         public async Task<ActionResult<Dto.User>> GetCurrentUser()
         {
             var userId = User.GetUserId();
