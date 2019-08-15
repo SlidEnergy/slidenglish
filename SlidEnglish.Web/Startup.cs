@@ -127,12 +127,9 @@ namespace SlidEnglish.Web
 					TokenUrl = "/api/v1/tokens"
 				});
 				c.AddSecurityDefinition("Bearer", new ApiKeyScheme { In = "header", Description = "Please enter JWT with Bearer into field", Name = "Authorization", Type = "apiKey" });
-				c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> {
-					{ "Oauth2", Enumerable.Empty<string>() },
-					{ "Bearer", Enumerable.Empty<string>() },
-				});
 
 				c.OperationFilter<ResponseWithDescriptionOperationFilter>();
+				c.OperationFilter<SecurityRequirementsOperationFilter>();
 			});
 
 			// AddIdentity и AddDefaultIdentity добавляют много чего лишнего. Ссылки для сранения.
