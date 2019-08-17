@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SlidEnglish.App;
-using SlidEnglish.Domain;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -24,31 +23,29 @@ namespace SlidEnglish.Web
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Dto.Word[]>> GetList()
+        public async Task<ActionResult<App.Dto.Word[]>> GetList()
         {
             var userId = User.GetUserId();
 
-            var banks = await _wordsService.GetListAsync(userId);
-            return _mapper.Map<Dto.Word[]>(banks);
+			return await _wordsService.GetListAsync(userId);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Dto.Word>> Add(Dto.Word word)
+        public async Task<ActionResult<App.Dto.Word>> Add(App.Dto.Word word)
         {
             var userId = User.GetUserId();
 
-            var newBank = await _wordsService.AddAsync(userId, _mapper.Map<Word>(word));
+            var newBank = await _wordsService.AddAsync(userId, word);
 
-            return CreatedAtAction("GetList", _mapper.Map<Dto.Word>(newBank));
+            return CreatedAtAction("GetList", newBank);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Dto.Word>> Update(int id, Dto.Word word)
+        public async Task<ActionResult<App.Dto.Word>> Update(int id, App.Dto.EditWordDto word)
         {
             var userId = User.GetUserId();
 
-            var editedBank = await _wordsService.EditAsync(userId, _mapper.Map<Word>(word));
-            return _mapper.Map<Dto.Word>(editedBank);
+            return await _wordsService.EditAsync(userId, word);
         }
 
         [HttpDelete("{id}")]

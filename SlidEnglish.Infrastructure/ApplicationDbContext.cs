@@ -25,7 +25,7 @@ namespace SlidEnglish.Infrastructure
 				.HasOne(e => e.Sinonym)
 				.WithMany(e => e.SinonymOf)
 				.HasForeignKey(e => e.SinonymId)
-				.OnDelete(DeleteBehavior.Restrict);
+				.OnDelete(DeleteBehavior.Cascade);
 
 			modelBuilder.Entity<WordSinonym>()
 				.HasOne(e => e.Word)

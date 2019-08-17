@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SlidEnglish.Web.Dto
+namespace SlidEnglish.App.Dto
 {
 	public class Word
 	{
@@ -14,5 +14,7 @@ namespace SlidEnglish.Web.Dto
 		public string Association { get; set; }
 
 		public string Description { get; set; }
+
+		public int[] Synonyms { get; set; }
 	}
 }

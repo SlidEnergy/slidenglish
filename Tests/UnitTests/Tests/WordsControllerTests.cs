@@ -15,7 +15,7 @@ namespace SlidEnglish.Web.UnitTests
 		[SetUp]
         public void Setup()
         {
-            var service = new WordsService(_mockedDal);
+            var service = new WordsService(_mockedDal, _autoMapper.Create(_db));
 			_controller = new WordsController(_autoMapper.Create(_db), service);
 			_controller.AddControllerContext(_user);
 		}

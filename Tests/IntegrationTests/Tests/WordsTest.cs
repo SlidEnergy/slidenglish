@@ -27,7 +27,7 @@ namespace SlidEnglish.Web.IntegrationTests
 		[Test]
 		public async Task AddWord_ShouldReturnContent()
 		{
-			var request = CreateAuthJsonRequest("POST", "/api/v1/words/", new Dto.Word () {  Text = "Word #1" });
+			var request = CreateAuthJsonRequest("POST", "/api/v1/words/", new App.Dto.Word () {  Text = "Word #1" });
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -42,10 +42,11 @@ namespace SlidEnglish.Web.IntegrationTests
 			var word = new Word() { Text = "Word #1", User = _user };
 			await _dal.Words.Add(word);
 
-			var request = CreateAuthJsonRequest("PUT", "/api/v1/words/" + word.Id, new Dto.Word
+			var request = CreateAuthJsonRequest("PUT", "/api/v1/words/" + word.Id, new App.Dto.EditWordDto
 			{
 				Id = word.Id,
-				Text = "Word #2"
+				Text = "Word #2",
+				Synonyms = new App.Dto.EditSynonymDto[] { }
 			});
 			
 			var response = await SendRequest(request);

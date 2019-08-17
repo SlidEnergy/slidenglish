@@ -15,7 +15,7 @@ namespace SlidEnglish.Web.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new WordsService(_mockedDal);
+            _service = new WordsService(_mockedDal, _autoMapper.Create(_db));
         }
 
         [Test]
@@ -24,7 +24,7 @@ namespace SlidEnglish.Web.UnitTests
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
             _words.Setup(x => x.Add(It.IsAny<Word>())).ReturnsAsync(new Word());
 
-            var category1 = await _service.AddAsync(_user.Id, new Word() { Text = "Word #1" });
+            var category1 = await _service.AddAsync(_user.Id, new App.Dto.Word() { Text = "Word #1" });
 
             _words.Verify(x => x.Add(
                 It.Is<Word>(c => c.Text == "Word #1" && c.User.Id == _user.Id)), Times.Exactly(1));
@@ -80,7 +80,7 @@ namespace SlidEnglish.Web.UnitTests
 
             var result = await _service.GetListAsync(_user.Id);
             
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(2, result.Count());
         }
     }
 }

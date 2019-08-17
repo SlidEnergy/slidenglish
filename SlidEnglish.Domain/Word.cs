@@ -20,10 +20,10 @@ namespace SlidEnglish.Domain
 		/// Описание, Этимология, ссылки на ресурсы
 		/// </summary>
 		[Required(AllowEmptyStrings = true)]
-		public string Description { get; set; }
+		public string Description { get; set; } = "";
 
 		[Required(AllowEmptyStrings = true)]
-		public string Association { get; set; }
+		public string Association { get; set; } = "";
 
 		public virtual ICollection<WordSinonym> Sinonyms{ get; set; }
 		public virtual ICollection<WordSinonym> SinonymOf { get; set; }
@@ -32,5 +32,12 @@ namespace SlidEnglish.Domain
 		public ICollection<Word> AllSinonyms => Sinonyms.Select(x => x.Sinonym).Union(SinonymOf.Select(x => x.Word)).ToList();
 
 		public bool IsBelongsTo(string userId) => User.Id == userId;
+
+		public Word() { }
+
+		public Word(string text)
+		{
+			Text = text;
+		}
 	}
 }

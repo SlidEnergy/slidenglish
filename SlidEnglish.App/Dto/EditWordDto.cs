@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SlidEnglish.Web.Dto
+namespace SlidEnglish.App.Dto
 {
-	public class DetailsWord
+	public class EditWordDto
 	{
 		public int Id { get; set; }
 
@@ -15,6 +15,13 @@ namespace SlidEnglish.Web.Dto
 
 		public string Description { get; set; }
 
-		public List<Dto.Word> Sinonyms { get; set; }
+		public EditSynonymDto[] Synonyms { get; set; }
+	}
+
+	public class EditSynonymDto
+	{
+		public int? Id { get; set; }
+
+		public string Text { get; set; }
 	}
 }
