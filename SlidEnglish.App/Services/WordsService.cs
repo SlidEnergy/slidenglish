@@ -41,42 +41,29 @@ namespace SlidEnglish.App
 			return _mapper.Map<Dto.Word[]>(words);
 		}
 
-		public async Task<Dto.Word> EditAsync(string userId, Dto.EditWordDto word)
+		public async Task<Dto.Word> EditAsync(string userId, Dto.Word word)
 		{
 			var editWord = await _dal.Words.GetByIdWithAccessCheck(userId, word.Id);
 			// вызываем чтобы сработал lazyloading, это позволит потом сохранить это свойство
 			var oldSynonyms = editWord.Sinonyms;
 			var oldSynonymsOf = editWord.SinonymOf;
 
-			_mapper.Map<Dto.EditWordDto, Word>(word, editWord);
+			_mapper.Map<Dto.Word, Word>(word, editWord);
 
 			var synonyms = new List<WordSinonym>(word.Synonyms.Length);
 			var synonymsOf = new List<WordSinonym>(word.Synonyms.Length);
 
-			foreach (var synonym in word.Synonyms)
+			foreach (var synonymId in word.Synonyms)
 			{
-				if (synonym.Id == null)
+				if (editWord.SinonymOf.Any(x => x.WordId == synonymId && x.SinonymId == editWord.Id))
 				{
-					if (!string.IsNullOrEmpty(synonym.Text))
-					{
-						var newWord = new Word(synonym.Text);
-						newWord.User = await _dal.Users.GetById(userId);
-						await _dal.Words.Add(newWord);
-						synonyms.Add(new WordSinonym(editWord, newWord));
-					}
+					var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
+					synonymsOf.Add(new WordSinonym(linkedWord, editWord));
 				}
 				else
 				{
-					if (editWord.SinonymOf.Any(x => x.WordId == synonym.Id.Value && x.SinonymId == editWord.Id))
-					{
-						var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonym.Id.Value);
-						synonymsOf.Add(new WordSinonym(linkedWord, editWord));
-					}
-					else
-					{
-						var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonym.Id.Value);
-						synonyms.Add(new WordSinonym(editWord, linkedWord));
-					}
+					var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
+					synonyms.Add(new WordSinonym(editWord, linkedWord));
 				}
 			}
 
