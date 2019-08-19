@@ -22,7 +22,14 @@ namespace SlidEnglish.App
 		{
 			var newWord = _mapper.Map<Word>(word);
 
-			newWord.User = await _dal.Users.GetById(userId); ;
+			newWord.User = await _dal.Users.GetById(userId);
+			newWord.Sinonyms = new List<WordSinonym>(word.Synonyms.Length);
+
+			foreach (var synonymId in word.Synonyms)
+			{
+					var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
+					newWord.Sinonyms.Add(new WordSinonym(newWord, linkedWord));
+			}
 
 			await _dal.Words.Add(newWord);
 
