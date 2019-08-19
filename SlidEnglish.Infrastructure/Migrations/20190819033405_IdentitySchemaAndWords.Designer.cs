@@ -10,8 +10,8 @@ using SlidEnglish.Infrastructure;
 namespace SlidEnglish.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190816230046_WordSynonymCascadeDelete")]
-    partial class WordSynonymCascadeDelete
+    [Migration("20190819033405_IdentitySchemaAndWords")]
+    partial class IdentitySchemaAndWords
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -225,17 +225,17 @@ namespace SlidEnglish.Infrastructure.Migrations
                     b.ToTable("Words");
                 });
 
-            modelBuilder.Entity("SlidEnglish.Domain.WordSinonym", b =>
+            modelBuilder.Entity("SlidEnglish.Domain.WordSynonym", b =>
                 {
                     b.Property<int>("WordId");
 
-                    b.Property<int>("SinonymId");
+                    b.Property<int>("SynonymId");
 
-                    b.HasKey("WordId", "SinonymId");
+                    b.HasKey("WordId", "SynonymId");
 
-                    b.HasIndex("SinonymId");
+                    b.HasIndex("SynonymId");
 
-                    b.ToTable("WordSinonym");
+                    b.ToTable("WordSynonym");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -299,15 +299,15 @@ namespace SlidEnglish.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SlidEnglish.Domain.WordSinonym", b =>
+            modelBuilder.Entity("SlidEnglish.Domain.WordSynonym", b =>
                 {
-                    b.HasOne("SlidEnglish.Domain.Word", "Sinonym")
-                        .WithMany("SinonymOf")
-                        .HasForeignKey("SinonymId")
+                    b.HasOne("SlidEnglish.Domain.Word", "Synonym")
+                        .WithMany("SynonymOf")
+                        .HasForeignKey("SynonymId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("SlidEnglish.Domain.Word", "Word")
-                        .WithMany("Sinonyms")
+                        .WithMany("Synonyms")
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

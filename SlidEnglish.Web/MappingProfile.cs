@@ -24,16 +24,16 @@ namespace SlidEnglish.Web
 					opt => opt.MapFrom(src => src.Association ?? ""))
 				.ForMember(dest => dest.Description,
 					opt => opt.MapFrom(src => src.Description ?? ""))
-				.ForMember(dest => dest.Sinonyms,
+				.ForMember(dest => dest.Synonyms,
 					opt => opt.Ignore())
-                .ForMember(dest => dest.SinonymOf,
+                .ForMember(dest => dest.SynonymOf,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.User,
                     opt => opt.Ignore());
 
 			CreateMap<Word, App.Dto.Word>()
 				.ForMember(dest => dest.Synonyms,
-					opt => opt.MapFrom(src => src.AllSinonyms.Select(x => x.Id).ToArray()));
+					opt => opt.MapFrom(src => src.AllSynonyms.Select(x => x.Id).ToArray()));
 		}
     }
 }

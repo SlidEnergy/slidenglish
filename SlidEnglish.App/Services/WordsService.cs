@@ -23,12 +23,16 @@ namespace SlidEnglish.App
 			var newWord = _mapper.Map<Word>(word);
 
 			newWord.User = await _dal.Users.GetById(userId);
-			newWord.Sinonyms = new List<WordSinonym>(word.Synonyms.Length);
 
-			foreach (var synonymId in word.Synonyms)
+			if (word.Synonyms != null && word.Synonyms.Length > 0)
 			{
+				newWord.Synonyms = new List<WordSynonym>(word.Synonyms.Length);
+
+				foreach (var synonymId in word.Synonyms)
+				{
 					var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
-					newWord.Sinonyms.Add(new WordSinonym(newWord, linkedWord));
+					newWord.Synonyms.Add(new WordSynonym(newWord, linkedWord));
+				}
 			}
 
 			await _dal.Words.Add(newWord);
@@ -52,30 +56,34 @@ namespace SlidEnglish.App
 		{
 			var editWord = await _dal.Words.GetByIdWithAccessCheck(userId, word.Id);
 			// вызываем чтобы сработал lazyloading, это позволит потом сохранить это свойство
-			var oldSynonyms = editWord.Sinonyms;
-			var oldSynonymsOf = editWord.SinonymOf;
+			var oldSynonyms = editWord.Synonyms;
+			var oldSynonymsOf = editWord.SynonymOf;
 
 			_mapper.Map<Dto.Word, Word>(word, editWord);
 
-			var synonyms = new List<WordSinonym>(word.Synonyms.Length);
-			var synonymsOf = new List<WordSinonym>(word.Synonyms.Length);
+			var synonyms = new List<WordSynonym>(word.Synonyms != null ? word.Synonyms.Length : 0);
+			var synonymsOf = new List<WordSynonym>(word.Synonyms != null ? word.Synonyms.Length : 0);
 
-			foreach (var synonymId in word.Synonyms)
+			// Обновляем список связанных синонимов
+			if (word.Synonyms != null && word.Synonyms.Length > 0)
 			{
-				if (editWord.SinonymOf.Any(x => x.WordId == synonymId && x.SinonymId == editWord.Id))
+				foreach (var synonymId in word.Synonyms)
 				{
-					var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
-					synonymsOf.Add(new WordSinonym(linkedWord, editWord));
-				}
-				else
-				{
-					var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
-					synonyms.Add(new WordSinonym(editWord, linkedWord));
+					if (editWord.SynonymOf.Any(x => x.WordId == synonymId && x.SynonymId == editWord.Id))
+					{
+						var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
+						synonymsOf.Add(new WordSynonym(linkedWord, editWord));
+					}
+					else
+					{
+						var linkedWord = await _dal.Words.GetByIdWithAccessCheck(userId, synonymId);
+						synonyms.Add(new WordSynonym(editWord, linkedWord));
+					}
 				}
 			}
 
-			editWord.Sinonyms = synonyms;
-			editWord.SinonymOf = synonymsOf;
+			editWord.Synonyms = synonyms;
+			editWord.SynonymOf = synonymsOf;
 
 			await _dal.SaveChangesAsync();
 

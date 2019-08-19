@@ -18,18 +18,18 @@ namespace SlidEnglish.Infrastructure
 		{
 			base.OnModelCreating(modelBuilder);
 
-			modelBuilder.Entity<WordSinonym>()
-				.HasKey(key => new { key.WordId, key.SinonymId });
+			modelBuilder.Entity<WordSynonym>()
+				.HasKey(key => new { key.WordId, key.SynonymId });
 
-			modelBuilder.Entity<WordSinonym>()
-				.HasOne(e => e.Sinonym)
-				.WithMany(e => e.SinonymOf)
-				.HasForeignKey(e => e.SinonymId)
+			modelBuilder.Entity<WordSynonym>()
+				.HasOne(e => e.Synonym)
+				.WithMany(e => e.SynonymOf)
+				.HasForeignKey(e => e.SynonymId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			modelBuilder.Entity<WordSinonym>()
+			modelBuilder.Entity<WordSynonym>()
 				.HasOne(e => e.Word)
-				.WithMany(e => e.Sinonyms)
+				.WithMany(e => e.Synonyms)
 				.HasForeignKey(e => e.WordId);
 		}
 

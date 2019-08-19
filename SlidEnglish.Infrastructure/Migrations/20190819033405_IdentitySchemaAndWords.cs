@@ -198,23 +198,23 @@ namespace SlidEnglish.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WordSinonym",
+                name: "WordSynonym",
                 columns: table => new
                 {
                     WordId = table.Column<int>(nullable: false),
-                    SinonymId = table.Column<int>(nullable: false)
+                    SynonymId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WordSinonym", x => new { x.WordId, x.SinonymId });
+                    table.PrimaryKey("PK_WordSynonym", x => new { x.WordId, x.SynonymId });
                     table.ForeignKey(
-                        name: "FK_WordSinonym_Words_SinonymId",
-                        column: x => x.SinonymId,
+                        name: "FK_WordSynonym_Words_SynonymId",
+                        column: x => x.SynonymId,
                         principalTable: "Words",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WordSinonym_Words_WordId",
+                        name: "FK_WordSynonym_Words_WordId",
                         column: x => x.WordId,
                         principalTable: "Words",
                         principalColumn: "Id",
@@ -269,9 +269,9 @@ namespace SlidEnglish.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WordSinonym_SinonymId",
-                table: "WordSinonym",
-                column: "SinonymId");
+                name: "IX_WordSynonym_SynonymId",
+                table: "WordSynonym",
+                column: "SynonymId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -295,7 +295,7 @@ namespace SlidEnglish.Infrastructure.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "WordSinonym");
+                name: "WordSynonym");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
