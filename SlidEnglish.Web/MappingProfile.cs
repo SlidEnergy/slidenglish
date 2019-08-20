@@ -24,44 +24,16 @@ namespace SlidEnglish.Web
 					opt => opt.MapFrom(src => src.Association ?? ""))
 				.ForMember(dest => dest.Description,
 					opt => opt.MapFrom(src => src.Description ?? ""))
-				.ForMember(dest => dest.Sinonyms,
+				.ForMember(dest => dest.Synonyms,
 					opt => opt.Ignore())
-    //            .ForMember(dest => dest.Sinonyms,
-    //                opt => opt.MapFrom<WordSinonym[]>((from, to) => {
-				//		var currentWord = context.Words.Find(from.Id);
-				//		var synonyms = context.Words.Where(x => from.Synonyms.Contains(x.Id)).ToArray();
-				//		var links = synonyms.Select(x => new WordSinonym(currentWord, x)).ToArray();
-				//		return links;
-				//	})
-				//)
-                .ForMember(dest => dest.SinonymOf,
+                .ForMember(dest => dest.SynonymOf,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.User,
                     opt => opt.Ignore());
 
-			CreateMap<App.Dto.EditWordDto, Word>()
-				.ForMember(dest => dest.Association,
-					opt => opt.MapFrom(src => src.Association ?? ""))
-				.ForMember(dest => dest.Description,
-					opt => opt.MapFrom(src => src.Description ?? ""))
-				.ForMember(dest => dest.Sinonyms,
-					opt => opt.Ignore())
-				//            .ForMember(dest => dest.Sinonyms,
-				//                opt => opt.MapFrom<WordSinonym[]>((from, to) => {
-				//		var currentWord = context.Words.Find(from.Id);
-				//		var synonyms = context.Words.Where(x => from.Synonyms.Contains(x.Id)).ToArray();
-				//		var links = synonyms.Select(x => new WordSinonym(currentWord, x)).ToArray();
-				//		return links;
-				//	})
-				//)
-				.ForMember(dest => dest.SinonymOf,
-					opt => opt.Ignore())
-				.ForMember(dest => dest.User,
-					opt => opt.Ignore());
-
 			CreateMap<Word, App.Dto.Word>()
 				.ForMember(dest => dest.Synonyms,
-					opt => opt.MapFrom(src => src.AllSinonyms.Select(x => x.Id).ToArray()));
+					opt => opt.MapFrom(src => src.AllSynonyms.Select(x => x.Id).ToArray()));
 		}
     }
 }

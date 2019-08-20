@@ -41,7 +41,7 @@ namespace SlidEnglish.Web
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<App.Dto.Word>> Update(int id, App.Dto.EditWordDto word)
+        public async Task<ActionResult<App.Dto.Word>> Update(int id, App.Dto.Word word)
         {
             var userId = User.GetUserId();
 

@@ -25,11 +25,11 @@ namespace SlidEnglish.Domain
 		[Required(AllowEmptyStrings = true)]
 		public string Association { get; set; } = "";
 
-		public virtual ICollection<WordSinonym> Sinonyms{ get; set; }
-		public virtual ICollection<WordSinonym> SinonymOf { get; set; }
+		public virtual ICollection<WordSynonym> Synonyms{ get; set; }
+		public virtual ICollection<WordSynonym> SynonymOf { get; set; }
 
 		[NotMapped]
-		public ICollection<Word> AllSinonyms => Sinonyms.Select(x => x.Sinonym).Union(SinonymOf.Select(x => x.Word)).ToList();
+		public ICollection<Word> AllSynonyms => Synonyms.Select(x => x.Synonym).Union(SynonymOf.Select(x => x.Word)).ToList();
 
 		public bool IsBelongsTo(string userId) => User.Id == userId;
 
