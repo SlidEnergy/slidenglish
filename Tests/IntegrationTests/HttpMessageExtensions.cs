@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SlidEnglish.App.Dto;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -24,5 +26,13 @@ namespace SlidEnglish.Web.IntegrationTests
             string json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<Dictionary<string, object>[]>(json);
         }
-    }
+
+		public static async Task<T> ToGraphQlResponse<T>(this HttpResponseMessage response, string field)
+		{
+			string json = await response.Content.ReadAsStringAsync();
+
+			var jobject = JObject.Parse(json);
+			return jobject["data"][field].ToObject<T>();
+		}
+	}
 }

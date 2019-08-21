@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using SlidEnglish.Domain;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using GraphiQl;
 
 namespace SlidEnglish.Web
 {
@@ -185,6 +186,7 @@ namespace SlidEnglish.Web
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 			});
 
+			app.UseGraphiQl("/graphql");
 			app.UseMvc();
 		}
 	}
