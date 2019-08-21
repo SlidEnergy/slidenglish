@@ -1,11 +1,7 @@
 ﻿using GraphQL.Types;
 using SlidEnglish.App;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace SlidEnglish.Web.GraphQL
+namespace SlidEnglish.Web.Graphql
 {
 	public class WordQuery : ObjectGraphType
 	{

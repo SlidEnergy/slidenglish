@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SlidEnglish.Web.GraphQL
+namespace SlidEnglish.Web.Graphql
 {
 	public class WordInputType : InputObjectGraphType
 	{

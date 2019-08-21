@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using SlidEnglish.Domain;
-using SlidEnglish.Web.GraphQL;
+using SlidEnglish.Web.Graphql;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,14 +11,16 @@ namespace SlidEnglish.Web.IntegrationTests
 	public class GraphQlTest : ControllerTestBase
 	{
 		[Test]
-		public async Task GetWordsList_ShouldReturnContent()
+		[TestCase("/schemafirstgraphql")]
+		[TestCase("/typefirstgraphql")]
+		public async Task GetWordsList_ShouldReturnContent(string url)
 		{
 			var word1 = new Word() { Text = "Word #1", User = _user };
             await _dal.Words.Add(word1);
 			var word2 = new Word() { Text = "Word #2", User = _user };
             await _dal.Words.Add(word2);
 
-			var request = CreateAuthJsonRequest("POST", "/graphql", new { Query = "{words{id,text,association,description,synonyms}}" });
+			var request = CreateAuthJsonRequest("POST", url, new { Query = "{words{id,text,association,description,synonyms}}" });
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -28,9 +30,11 @@ namespace SlidEnglish.Web.IntegrationTests
 		}
 
 		[Test]
-		public async Task AddWord_ShouldReturnContent()
+		[TestCase("/schemafirstgraphql")]
+		[TestCase("/typefirstgraphql")]
+		public async Task AddWord_ShouldReturnContent(string url)
 		{
-			var request = CreateAuthJsonRequest("POST", "/graphql", new GraphQlQuery()
+			var request = CreateAuthJsonRequest("POST", url, new GraphQlQuery()
 			{
 				Query = "mutation($word: wordInput!){addWord(word: $word){id,text,association,description,synonyms}}",
 				Variables = JObject.FromObject(new { word = new { text = "Word #1", association = "Association #1", description = "Description #1", synonyms = new int[] { } } })
@@ -44,12 +48,14 @@ namespace SlidEnglish.Web.IntegrationTests
 		}
 
 		[Test]
-		public async Task UpdateWord_ShouldReturnContent()
+		[TestCase("/schemafirstgraphql")]
+		[TestCase("/typefirstgraphql")]
+		public async Task UpdateWord_ShouldReturnContent(string url)
 		{
 			var word = new Word() { Text = "Word #1", User = _user };
 			await _dal.Words.Add(word);
 
-			var request = CreateAuthJsonRequest("POST", "/graphql", new GraphQlQuery()
+			var request = CreateAuthJsonRequest("POST", url, new GraphQlQuery()
 			{
 				Query = "mutation($word: wordInput!){updateWord(word: $word){id,text,association,description,synonyms}}",
 				Variables = JObject.FromObject(new { word = new { id = word.Id, text = "Word #1", association = "Association #1", description = "Description #1", synonyms = new int[] { } } })
@@ -64,12 +70,14 @@ namespace SlidEnglish.Web.IntegrationTests
 		}
 
 		[Test]
-		public async Task DeleteWord_ShouldNoContent()
+		[TestCase("/schemafirstgraphql")]
+		[TestCase("/typefirstgraphql")]
+		public async Task DeleteWord_ShouldNoContent(string url)
 		{
 			var word = new Word() { Text = "Word #1", User = _user };
 			await _dal.Words.Add(word);
 
-			var request = CreateAuthJsonRequest("POST", "/graphql", new GraphQlQuery()
+			var request = CreateAuthJsonRequest("POST", url, new GraphQlQuery()
 			{
 				Query = "mutation($id: Int!){deleteWord(id: $id)}",
 				Variables = JObject.FromObject(new { id = word.Id })

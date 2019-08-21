@@ -3,21 +3,23 @@ using GraphQL.Types;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SlidEnglish.App;
-using SlidEnglish.Web.GraphQL;
+using SlidEnglish.Web.Graphql;
 using System.Threading.Tasks;
 
 namespace SlidEnglish.Web.Controllers
 {
 	[Authorize]
-	[Route("graphql")]
+	[Route("typefirstgraphql")]
 	[ApiController]
-	public class GraphQlController : ControllerBase
+	public class TypeFirstGraphQlController : ControllerBase
 	{
 		private WordsService _wordsService;
+		private readonly IDependencyResolver _dependencyResolver;
 
-		public GraphQlController(WordsService wordsService)
+		public TypeFirstGraphQlController(WordsService wordsService, IDependencyResolver dependencyResolver)
 		{
 			_wordsService = wordsService;
+			_dependencyResolver = dependencyResolver;
 		}
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] GraphQlQuery query)
@@ -35,7 +37,7 @@ namespace SlidEnglish.Web.Controllers
 			var result = await new DocumentExecuter().ExecuteAsync(c =>
 			{
 				c.Schema = schema;
-				c.Query = query.Query;	
+				c.Query = query.Query;
 				c.OperationName = query.OperationName;
 				c.Inputs = inputs;
 			});

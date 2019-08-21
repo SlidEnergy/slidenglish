@@ -141,7 +141,8 @@ namespace SlidEnglish.Web
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddSingleton<AuthSettings>(x => AuthSettings);
-
+			services.AddScoped<Graphql.Query>();
+			services.AddScoped<GraphQL.IDependencyResolver>(x => new GraphQL.FuncDependencyResolver(x.GetRequiredService));
             services.AddSlidEnglishServices();
 		}
 
