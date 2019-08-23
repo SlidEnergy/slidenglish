@@ -25,8 +25,8 @@ namespace SlidEnglish.Domain
 		[Required(AllowEmptyStrings = true)]
 		public string Association { get; set; } = "";
 
-		public virtual ICollection<WordSynonym> Synonyms{ get; set; }
-		public virtual ICollection<WordSynonym> SynonymOf { get; set; }
+		public virtual IList<WordSynonym> Synonyms { get; set; } = new List<WordSynonym>();
+		public virtual IList<WordSynonym> SynonymOf { get; set; } = new List<WordSynonym>();
 
 		[NotMapped]
 		public ICollection<Word> AllSynonyms => Synonyms.Select(x => x.Synonym).Union(SynonymOf.Select(x => x.Word)).ToList();

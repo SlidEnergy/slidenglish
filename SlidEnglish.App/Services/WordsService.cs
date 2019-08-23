@@ -52,7 +52,7 @@ namespace SlidEnglish.App
 			return _mapper.Map<Dto.Word[]>(words);
 		}
 
-		public async Task<Dto.Word> EditAsync(string userId, Dto.Word word)
+		public async Task<Dto.Word> UpdateAsync(string userId, Dto.Word word)
 		{
 			var editWord = await _dal.Words.GetByIdWithAccessCheck(userId, word.Id);
 			// вызываем чтобы сработал lazyloading, это позволит потом сохранить это свойство
@@ -85,7 +85,7 @@ namespace SlidEnglish.App
 			editWord.Synonyms = synonyms;
 			editWord.SynonymOf = synonymsOf;
 
-			await _dal.SaveChangesAsync();
+			await _dal.Words.Update(editWord);
 
 			return _mapper.Map<Dto.Word>(editWord);
 		}

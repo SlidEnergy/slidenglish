@@ -45,7 +45,7 @@ namespace SlidEnglish.Web
         {
             var userId = User.GetUserId();
 
-            return await _wordsService.EditAsync(userId, word);
+            return await _wordsService.UpdateAsync(userId, word);
         }
 
         [HttpDelete("{id}")]
