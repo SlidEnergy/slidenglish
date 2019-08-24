@@ -22,7 +22,7 @@ namespace SlidEnglish.Web.Controllers
 			_dependencyResolver = dependencyResolver;
 		}
 		[HttpPost]
-		public async Task<IActionResult> Post([FromBody] GraphQlQuery query)
+		public async Task<ActionResult<ExecutionResult>> Post([FromBody] GraphQlQuery query)
 		{
 			var userId = User.GetUserId();
 
@@ -34,7 +34,7 @@ namespace SlidEnglish.Web.Controllers
 					text: String!
 					association: String!
 					description: String!
-					synonyms: [Int]!
+					synonyms: [Word]!
 				}
 
 				input wordInput {

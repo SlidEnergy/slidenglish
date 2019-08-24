@@ -20,7 +20,7 @@ namespace SlidEnglish.Web.IntegrationTests
 			var word2 = new Word() { Text = "Word #2", User = _user };
             await _dal.Words.Add(word2);
 
-			var request = CreateAuthJsonRequest("POST", url, new { Query = "{words{id,text,association,description,synonyms}}" });
+			var request = CreateAuthJsonRequest("POST", url, new { Query = "{words{id,text,association,description,synonyms{id,text}}}" });
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -36,7 +36,7 @@ namespace SlidEnglish.Web.IntegrationTests
 		{
 			var request = CreateAuthJsonRequest("POST", url, new GraphQlQuery()
 			{
-				Query = "mutation($word: wordInput!){addWord(word: $word){id,text,association,description,synonyms}}",
+				Query = "mutation($word: wordInput!){addWord(word: $word){id,text,association,description,synonyms{id,text}}}",
 				Variables = JObject.FromObject(new { word = new { text = "Word #1", association = "Association #1", description = "Description #1", synonyms = new int[] { } } })
 			});
 			var response = await SendRequest(request);
@@ -57,7 +57,7 @@ namespace SlidEnglish.Web.IntegrationTests
 
 			var request = CreateAuthJsonRequest("POST", url, new GraphQlQuery()
 			{
-				Query = "mutation($word: wordInput!){updateWord(word: $word){id,text,association,description,synonyms}}",
+				Query = "mutation($word: wordInput!){updateWord(word: $word){id,text,association,description,synonyms{id,text}}}",
 				Variables = JObject.FromObject(new { word = new { id = word.Id, text = "Word #1", association = "Association #1", description = "Description #1", synonyms = new int[] { } } })
 			});
 

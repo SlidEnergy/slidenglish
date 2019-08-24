@@ -153,7 +153,7 @@ namespace SlidEnglish.Web.UnitTests
 				User = _user,
 			});
 			word2.Synonyms = new List<WordSynonym>() { new WordSynonym(word2, word1) };
-            await _dal.Words.Update(word2);
+			await _dal.Words.Update(word2);
 
 			var word3 = await _dal.Words.Add(new Word()
 			{
@@ -196,7 +196,7 @@ namespace SlidEnglish.Web.UnitTests
 			});
 
 			word1.Synonyms = new List<WordSynonym>() { new WordSynonym(word1, word2) };
-            await _dal.Words.Update(word1);
+			await _dal.Words.Update(word1);
 
 			var word3 = await _dal.Words.Add(new Word()
 			{
@@ -204,7 +204,7 @@ namespace SlidEnglish.Web.UnitTests
 				User = _user,
 			});
 			word3.Synonyms = new List<WordSynonym>() { new WordSynonym(word3, word1) };
-            await _dal.Words.Update(word3);
+			await _dal.Words.Update(word3);
 
 			var word4 = await _dal.Words.Add(new Word()
 			{
@@ -212,7 +212,7 @@ namespace SlidEnglish.Web.UnitTests
 				User = _user,
 			});
 			word4.Synonyms = new List<WordSynonym>() { new WordSynonym(word4, word1) };
-            await _dal.Words.Update(word4);
+			await _dal.Words.Update(word4);
 
             var word5 = await _dal.Words.Add(new Word()
 			{

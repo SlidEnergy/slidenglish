@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using SlidEnglish.App;
 using SlidEnglish.App.Dto;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidEnglish.Web.Graphql
@@ -18,16 +19,33 @@ namespace SlidEnglish.Web.Graphql
 
 
 		[GraphQLMetadata("addWord")]
-		public async Task<Word> AddWord(Word word)
+		public async Task<object> AddWord(Word word)
 		{
-			return await _wordsService.AddAsync(_userId, word);
-		}
+			var newWord = await _wordsService.AddAsync(_userId, word);
+            var words = await _wordsService.GetListAsync(_userId);
+            return new {
+                Id = newWord.Id,
+                Text = newWord.Text,
+                Association = newWord.Association,
+                Description = newWord.Description,
+                Synonyms = words.Where(w => newWord.Synonyms.Contains(w.Id))
+            };
+        }
 
 		[GraphQLMetadata("updateWord")]
-		public async Task<Word> UpdateWord(Word word)
+		public async Task<object> UpdateWord(Word word)
 		{
-			return await _wordsService.EditAsync(_userId, word);
-		}
+			var newWord = await _wordsService.UpdateAsync(_userId, word);
+            var words = await _wordsService.GetListAsync(_userId);
+            return new
+            {
+                Id = newWord.Id,
+                Text = newWord.Text,
+                Association = newWord.Association,
+                Description = newWord.Description,
+                Synonyms = words.Where(w => newWord.Synonyms.Contains(w.Id))
+            };
+        }
 
 		[GraphQLMetadata("deleteWord")]
 		public async Task<bool> DeleteWord(int id)

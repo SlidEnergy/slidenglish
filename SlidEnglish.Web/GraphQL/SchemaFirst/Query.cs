@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using SlidEnglish.App;
 using SlidEnglish.App.Dto;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidEnglish.Web.Graphql
@@ -18,9 +19,16 @@ namespace SlidEnglish.Web.Graphql
 
 
 		[GraphQLMetadata("words")]
-		public async Task<Word[]> Words()
+		public async Task<object[]> Words()
 		{
-			return await _wordsService.GetListAsync(_userId);
+			var words = await _wordsService.GetListAsync(_userId);
+			return words.Select(x => new {
+				Id = x.Id,
+				Text = x.Text,
+				Association = x.Association,
+				Description = x.Description,
+				Synonyms = words.Where(w => x.Synonyms.Contains(w.Id))
+			}).ToArray();
 		}
 	}
 }
