@@ -89,7 +89,7 @@ namespace SlidEnglish.Web.UnitTests
 				Description = "Description #2",
 			};
 
-			var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
+			await _service.UpdateAsync(_user.Id, updatedWord);
 
 			_words.Verify(x => x.Update(
 				It.Is<Word>(c =>
@@ -153,6 +153,7 @@ namespace SlidEnglish.Web.UnitTests
 				User = _user,
 			});
 			word2.Synonyms = new List<WordSynonym>() { new WordSynonym(word2, word1) };
+            await _dal.Words.Update(word2);
 
 			var word3 = await _dal.Words.Add(new Word()
 			{
@@ -171,7 +172,7 @@ namespace SlidEnglish.Web.UnitTests
 				Synonyms = new[] { word2.Id }
 			};
 
-			var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
+			await _service.UpdateAsync(_user.Id, updatedWord);
 
 			_words.Verify(x => x.Update(
 				It.Is<Word>(c =>
@@ -195,6 +196,7 @@ namespace SlidEnglish.Web.UnitTests
 			});
 
 			word1.Synonyms = new List<WordSynonym>() { new WordSynonym(word1, word2) };
+            await _dal.Words.Update(word1);
 
 			var word3 = await _dal.Words.Add(new Word()
 			{
@@ -202,14 +204,17 @@ namespace SlidEnglish.Web.UnitTests
 				User = _user,
 			});
 			word3.Synonyms = new List<WordSynonym>() { new WordSynonym(word3, word1) };
+            await _dal.Words.Update(word3);
+
 			var word4 = await _dal.Words.Add(new Word()
 			{
 				Text = "Word #4",
 				User = _user,
 			});
 			word4.Synonyms = new List<WordSynonym>() { new WordSynonym(word4, word1) };
+            await _dal.Words.Update(word4);
 
-			var word5 = await _dal.Words.Add(new Word()
+            var word5 = await _dal.Words.Add(new Word()
 			{
 				Text = "Word #5",
 				User = _user,
