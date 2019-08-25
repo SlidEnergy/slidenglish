@@ -10,6 +10,7 @@ namespace SlidEnglish.Web.Controllers
 {
 	[Authorize]
 	[Route("schemafirstgraphql")]
+    [Route("graphql")]
 	[ApiController]
 	public class SchemaFirstGraphQlController : ControllerBase
 	{
@@ -40,9 +41,9 @@ namespace SlidEnglish.Web.Controllers
 				input wordInput {
 					id: Int
 					text: String!
-					association: String!
-					description: String!
-					synonyms: [Int]!
+					association: String
+					description: String
+					synonyms: [Int]
 				}
 
 				type Query {

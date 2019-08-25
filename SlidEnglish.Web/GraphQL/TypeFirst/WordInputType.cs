@@ -15,9 +15,9 @@ namespace SlidEnglish.Web.Graphql
 
 			Field<IntGraphType>("id");
 			Field<NonNullGraphType<StringGraphType>>("text");
-			Field<NonNullGraphType<StringGraphType>>("association");
-			Field<NonNullGraphType<StringGraphType>>("description");
-			Field<NonNullGraphType<ListGraphType<IntGraphType>>>("synonyms");
+			Field<StringGraphType>("association");
+			Field<StringGraphType>("description");
+			Field<ListGraphType<IntGraphType>>("synonyms");
 		}
 	}
 }
