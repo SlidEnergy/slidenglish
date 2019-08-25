@@ -45,6 +45,9 @@ namespace SlidEnglish.Web
         {
             var userId = User.GetUserId();
 
+            if (id != word.Id)
+                return BadRequest();
+
             return await _wordsService.UpdateAsync(userId, word);
         }
 
