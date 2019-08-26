@@ -24,5 +24,11 @@ namespace SlidEnglish.Web.IntegrationTests
             string json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<Dictionary<string, object>[]>(json);
         }
+
+        public static async Task<T> ToObject<T>(this HttpResponseMessage response)
+        {
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(json);
+        }
     }
 }
