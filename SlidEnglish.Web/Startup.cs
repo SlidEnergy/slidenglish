@@ -20,6 +20,8 @@ using Microsoft.IdentityModel.Tokens;
 using SlidEnglish.Domain;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Google.Apis.Auth.OAuth2;
+using System.IO;
 
 namespace SlidEnglish.Web
 {
@@ -64,6 +66,17 @@ namespace SlidEnglish.Web
 				}
 			}
 		}
+
+        private GoogleCredential GoogleCredential
+        {
+            get
+            {
+                if (CurrentEnvironment.IsDevelopment())
+                    return GoogleCredential.FromFile(Path.Combine(CurrentEnvironment.ContentRootPath, "..", "google-translate-secret.json"));
+                else
+                    return GoogleCredential.FromJson(Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS"));
+            }
+        }
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
@@ -140,6 +153,8 @@ namespace SlidEnglish.Web
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddSingleton<AuthSettings>(x => AuthSettings);
+
+            services.AddSingleton<GoogleCredential>(x => GoogleCredential);
 
             services.AddSlidEnglishServices();
 		}
