@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SlidEnglish.Infrastructure
 {
-    public class EfWordsRepository : EfRepository<Word, int>, IRepositoryWithAccessCheck<Word>
+    public class EfWordsRepository : EfRepository<Word, int>, IWordsRepository
     {
         public EfWordsRepository(ApplicationDbContext dbContext) : base(dbContext) {}
 
@@ -20,5 +20,10 @@ namespace SlidEnglish.Infrastructure
 		{
 			return await _dbContext.Words.FirstOrDefaultAsync(x => x.User.Id == userId && x.Id == id);
 		}
+
+        public async Task<Word> GetByTextWithAccessCheck(string userId, string text)
+        {
+            return await _dbContext.Words.FirstOrDefaultAsync(x => x.User.Id == userId && x.Text == text);
+        }
     }
 }

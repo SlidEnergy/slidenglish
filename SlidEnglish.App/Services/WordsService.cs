@@ -18,11 +18,12 @@ namespace SlidEnglish.App
 			_mapper = mapper;
 		}
 
-		public async Task<Dto.Word> AddAsync(string userId, Dto.Word word)
+        public async Task<Dto.Word> AddAsync(string userId, Dto.Word word)
 		{
 			var newWord = _mapper.Map<Word>(word);
 
 			newWord.User = await _dal.Users.GetById(userId);
+            newWord.Attributes = WordAttribute.UserInput;
 
 			if (word.Synonyms != null && word.Synonyms.Length > 0)
 			{
@@ -45,7 +46,12 @@ namespace SlidEnglish.App
 			return _dal.Words.GetByIdWithAccessCheck(userId, id);
 		}
 
-		public async Task<Dto.Word[]> GetListAsync(string userId)
+        public Task<Word> GetAsync(string userId, string text)
+        {
+            return _dal.Words.GetByTextWithAccessCheck(userId, text);
+        }
+
+        public async Task<Dto.Word[]> GetListAsync(string userId)
 		{
 			var words = await _dal.Words.GetListWithAccessCheck(userId);
 
@@ -90,7 +96,9 @@ namespace SlidEnglish.App
 			return _mapper.Map<Dto.Word>(editWord);
 		}
 
-		public async Task<bool> ExistsAsync(string userId, Word word) => await _dal.Words.GetByIdWithAccessCheck(userId, word.Id) != null;
+        public async Task<bool> ExistsAsync(string userId, string word) => await _dal.Words.GetByTextWithAccessCheck(userId, word) != null;
+
+        public async Task<bool> ExistsAsync(string userId, Word word) => await _dal.Words.GetByIdWithAccessCheck(userId, word.Id) != null;
 
 		public async Task DeleteAsync(string userId, int id)
 		{

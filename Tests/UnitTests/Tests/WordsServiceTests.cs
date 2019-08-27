@@ -37,6 +37,7 @@ namespace SlidEnglish.Web.UnitTests
 				c.Text == word.Text && 
 				c.Association == word.Association &&
 				c.Description == word.Description &&
+                c.Attributes == WordAttribute.UserInput &&
 				c.User.Id == _user.Id)), Times.Exactly(1));
         }
 

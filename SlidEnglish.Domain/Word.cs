@@ -11,7 +11,7 @@ namespace SlidEnglish.Domain
 		public int Id { get; set; }
 
 		[Required]
-		public string Text { get; set; }
+        public string Text { get; set; }
 
 		[Required]
 		public virtual User User { get; set; }
@@ -28,7 +28,11 @@ namespace SlidEnglish.Domain
 		public virtual IList<WordSynonym> Synonyms { get; set; } = new List<WordSynonym>();
 		public virtual IList<WordSynonym> SynonymOf { get; set; } = new List<WordSynonym>();
 
-		[NotMapped]
+        public int Usages { get; set; }
+
+        public WordAttribute Attributes { get; set; }
+
+        [NotMapped]
 		public ICollection<Word> AllSynonyms => Synonyms.Select(x => x.Synonym).Union(SynonymOf.Select(x => x.Word)).ToList();
 
 		public bool IsBelongsTo(string userId) => User.Id == userId;

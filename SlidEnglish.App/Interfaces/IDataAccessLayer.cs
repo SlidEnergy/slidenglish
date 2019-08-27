@@ -5,7 +5,7 @@ namespace SlidEnglish.App
 {
 	public interface IDataAccessLayer
     {
-        IRepositoryWithAccessCheck<Word> Words { get; }
+        IWordsRepository Words { get; }
 		IRepository<User, string> Users { get; }
         IRefreshTokensRepository RefreshTokens { get; }
 

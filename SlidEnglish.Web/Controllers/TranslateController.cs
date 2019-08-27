@@ -15,13 +15,13 @@ namespace SlidEnglish.Web.Controllers
     public class TranslateController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly WordsService _wordsService;
+        private readonly TranslateService _translateService;
         private readonly GoogleCredential _googleCredential;
 
-        public TranslateController(IMapper mapper, WordsService wordsService, GoogleCredential googleCredential)
+        public TranslateController(IMapper mapper, TranslateService translateService, GoogleCredential googleCredential)
         {
             _mapper = mapper;
-            _wordsService = wordsService;
+            _translateService = translateService;
             _googleCredential = googleCredential;
         }
 
@@ -31,10 +31,12 @@ namespace SlidEnglish.Web.Controllers
         {
             var userId = User.GetUserId();
 
+            await _translateService.ProcessTranslate(userId, data.Text);
+
             try
             {
                 TranslationClient client = TranslationClient.Create(_googleCredential);
-                var response = await client.TranslateTextAsync(data.Text, "ru");
+                var response = await client.TranslateTextAsync(data.Text, "ru", "en");
 
                 return Ok(new TranslateData { Text = response.TranslatedText });
             }

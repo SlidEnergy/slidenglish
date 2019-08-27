@@ -19,17 +19,14 @@ namespace SlidEnglish.Web
 
             CreateMap<User, Dto.User>();
 
-			CreateMap<App.Dto.Word, Word>()
-				.ForMember(dest => dest.Association,
-					opt => opt.MapFrom(src => src.Association ?? ""))
-				.ForMember(dest => dest.Description,
-					opt => opt.MapFrom(src => src.Description ?? ""))
-				.ForMember(dest => dest.Synonyms,
-					opt => opt.Ignore())
-                .ForMember(dest => dest.SynonymOf,
-                    opt => opt.Ignore())
-                .ForMember(dest => dest.User,
-                    opt => opt.Ignore());
+            CreateMap<App.Dto.Word, Word>()
+                .ForMember(dest => dest.Text,
+                    opt => opt.MapFrom(src => src.Text ?? ""))
+                .ForMember(dest => dest.Association,
+                    opt => opt.MapFrom(src => src.Association ?? ""))
+                .ForMember(dest => dest.Description,
+                    opt => opt.MapFrom(src => src.Description ?? ""))
+                .ForAllOtherMembers(opt => opt.Ignore());
 
 			CreateMap<Word, App.Dto.Word>()
 				.ForMember(dest => dest.Synonyms,

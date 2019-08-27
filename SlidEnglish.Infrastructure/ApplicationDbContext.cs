@@ -18,7 +18,10 @@ namespace SlidEnglish.Infrastructure
 		{
 			base.OnModelCreating(modelBuilder);
 
-			modelBuilder.Entity<WordSynonym>()
+            modelBuilder.Entity<Word>()
+                .HasIndex(x => x.Text);
+
+            modelBuilder.Entity<WordSynonym>()
 				.HasKey(key => new { key.WordId, key.SynonymId });
 
 			modelBuilder.Entity<WordSynonym>()

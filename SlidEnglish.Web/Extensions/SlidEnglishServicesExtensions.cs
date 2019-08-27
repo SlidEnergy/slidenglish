@@ -16,14 +16,15 @@ namespace SlidEnglish.Web
             services.AddScoped<ITokenGenerator, TokenGenerator>();
 
             services.AddScoped<IRepository<User, string>, EfRepository<User, string>>();
-			services.AddScoped<IRepositoryWithAccessCheck<Word>, EfWordsRepository>();
+			services.AddScoped<IWordsRepository, EfWordsRepository>();
             services.AddScoped<IRefreshTokensRepository, EfRefreshTokensRepository>();
 
             services.AddScoped<UsersService>();
             services.AddScoped<TokenService>();
             services.AddScoped<WordsService>();
+            services.AddScoped<TranslateService>();
 
-			services.AddScoped<IDataAccessLayer, DataAccessLayer>();
+            services.AddScoped<IDataAccessLayer, DataAccessLayer>();
 		}
 	}
 }
