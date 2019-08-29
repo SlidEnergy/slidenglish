@@ -154,6 +154,31 @@ namespace SlidEnglish.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LexicalUnits",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    Text = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: false),
+                    Notes = table.Column<string>(nullable: false),
+                    Association = table.Column<string>(nullable: false),
+                    UsagesCount = table.Column<int>(nullable: false),
+                    InputAttributes = table.Column<int>(nullable: false),
+                    PartOfSpeech = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LexicalUnits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LexicalUnits_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
@@ -176,47 +201,47 @@ namespace SlidEnglish.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Words",
+                name: "ExampleOfUse",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    Text = table.Column<string>(nullable: false),
-                    UserId = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(nullable: false),
-                    Association = table.Column<string>(nullable: false)
+                    Example = table.Column<string>(nullable: false),
+                    Attribute = table.Column<int>(nullable: false),
+                    LexicalUnitId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Words", x => x.Id);
+                    table.PrimaryKey("PK_ExampleOfUse", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Words_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_ExampleOfUse_LexicalUnits_LexicalUnitId",
+                        column: x => x.LexicalUnitId,
+                        principalTable: "LexicalUnits",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "WordSynonym",
+                name: "LexicalUnitToLexicalUnitRelation",
                 columns: table => new
                 {
-                    WordId = table.Column<int>(nullable: false),
-                    SynonymId = table.Column<int>(nullable: false)
+                    LexicalUnitId = table.Column<int>(nullable: false),
+                    RelatedLexicalUnitId = table.Column<int>(nullable: false),
+                    Attribute = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WordSynonym", x => new { x.WordId, x.SynonymId });
+                    table.PrimaryKey("PK_LexicalUnitToLexicalUnitRelation", x => new { x.LexicalUnitId, x.RelatedLexicalUnitId });
                     table.ForeignKey(
-                        name: "FK_WordSynonym_Words_SynonymId",
-                        column: x => x.SynonymId,
-                        principalTable: "Words",
+                        name: "FK_LexicalUnitToLexicalUnitRelation_LexicalUnits_LexicalUnitId",
+                        column: x => x.LexicalUnitId,
+                        principalTable: "LexicalUnits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WordSynonym_Words_WordId",
-                        column: x => x.WordId,
-                        principalTable: "Words",
+                        name: "FK_LexicalUnitToLexicalUnitRelation_LexicalUnits_RelatedLexica~",
+                        column: x => x.RelatedLexicalUnitId,
+                        principalTable: "LexicalUnits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -259,19 +284,29 @@ namespace SlidEnglish.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExampleOfUse_LexicalUnitId",
+                table: "ExampleOfUse",
+                column: "LexicalUnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LexicalUnits_Text",
+                table: "LexicalUnits",
+                column: "Text");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LexicalUnits_UserId",
+                table: "LexicalUnits",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LexicalUnitToLexicalUnitRelation_RelatedLexicalUnitId",
+                table: "LexicalUnitToLexicalUnitRelation",
+                column: "RelatedLexicalUnitId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Words_UserId",
-                table: "Words",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WordSynonym_SynonymId",
-                table: "WordSynonym",
-                column: "SynonymId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -292,16 +327,19 @@ namespace SlidEnglish.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "RefreshTokens");
+                name: "ExampleOfUse");
 
             migrationBuilder.DropTable(
-                name: "WordSynonym");
+                name: "LexicalUnitToLexicalUnitRelation");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Words");
+                name: "LexicalUnits");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

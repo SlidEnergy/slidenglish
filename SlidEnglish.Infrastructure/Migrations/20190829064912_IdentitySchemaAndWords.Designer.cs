@@ -10,8 +10,8 @@ using SlidEnglish.Infrastructure;
 namespace SlidEnglish.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190827011319_AddWordIndexByText")]
-    partial class AddWordIndexByText
+    [Migration("20190829064912_IdentitySchemaAndWords")]
+    partial class IdentitySchemaAndWords
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -128,6 +128,72 @@ namespace SlidEnglish.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("SlidEnglish.Domain.ExampleOfUse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Attribute");
+
+                    b.Property<string>("Example")
+                        .IsRequired();
+
+                    b.Property<int?>("LexicalUnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LexicalUnitId");
+
+                    b.ToTable("ExampleOfUse");
+                });
+
+            modelBuilder.Entity("SlidEnglish.Domain.LexicalUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Association")
+                        .IsRequired();
+
+                    b.Property<int>("InputAttributes");
+
+                    b.Property<string>("Notes")
+                        .IsRequired();
+
+                    b.Property<int>("PartOfSpeech");
+
+                    b.Property<string>("Text")
+                        .IsRequired();
+
+                    b.Property<int>("UsagesCount");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Text");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LexicalUnits");
+                });
+
+            modelBuilder.Entity("SlidEnglish.Domain.LexicalUnitToLexicalUnitRelation", b =>
+                {
+                    b.Property<int>("LexicalUnitId");
+
+                    b.Property<int>("RelatedLexicalUnitId");
+
+                    b.Property<int>("Attribute");
+
+                    b.HasKey("LexicalUnitId", "RelatedLexicalUnitId");
+
+                    b.HasIndex("RelatedLexicalUnitId");
+
+                    b.ToTable("LexicalUnitToLexicalUnitRelation");
+                });
+
             modelBuilder.Entity("SlidEnglish.Domain.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -201,49 +267,6 @@ namespace SlidEnglish.Infrastructure.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SlidEnglish.Domain.Word", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Association")
-                        .IsRequired();
-
-                    b.Property<int>("Attributes");
-
-                    b.Property<string>("Description")
-                        .IsRequired();
-
-                    b.Property<string>("Text")
-                        .IsRequired();
-
-                    b.Property<int>("Usages");
-
-                    b.Property<string>("UserId")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Text");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Words");
-                });
-
-            modelBuilder.Entity("SlidEnglish.Domain.WordSynonym", b =>
-                {
-                    b.Property<int>("WordId");
-
-                    b.Property<int>("SynonymId");
-
-                    b.HasKey("WordId", "SynonymId");
-
-                    b.HasIndex("SynonymId");
-
-                    b.ToTable("WordSynonym");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -289,32 +312,39 @@ namespace SlidEnglish.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("SlidEnglish.Domain.ExampleOfUse", b =>
+                {
+                    b.HasOne("SlidEnglish.Domain.LexicalUnit")
+                        .WithMany("ExamplesOfUse")
+                        .HasForeignKey("LexicalUnitId");
+                });
+
+            modelBuilder.Entity("SlidEnglish.Domain.LexicalUnit", b =>
+                {
+                    b.HasOne("SlidEnglish.Domain.User", "User")
+                        .WithMany("LexicalUnits")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SlidEnglish.Domain.LexicalUnitToLexicalUnitRelation", b =>
+                {
+                    b.HasOne("SlidEnglish.Domain.LexicalUnit", "LexicalUnit")
+                        .WithMany("RelatedLexicalUnits")
+                        .HasForeignKey("LexicalUnitId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SlidEnglish.Domain.LexicalUnit", "RelatedLexicalUnit")
+                        .WithMany("RelatedLexicalUnitsOf")
+                        .HasForeignKey("RelatedLexicalUnitId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SlidEnglish.Domain.RefreshToken", b =>
                 {
                     b.HasOne("SlidEnglish.Domain.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SlidEnglish.Domain.Word", b =>
-                {
-                    b.HasOne("SlidEnglish.Domain.User", "User")
-                        .WithMany("Words")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SlidEnglish.Domain.WordSynonym", b =>
-                {
-                    b.HasOne("SlidEnglish.Domain.Word", "Synonym")
-                        .WithMany("SynonymOf")
-                        .HasForeignKey("SynonymId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("SlidEnglish.Domain.Word", "Word")
-                        .WithMany("Synonyms")
-                        .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

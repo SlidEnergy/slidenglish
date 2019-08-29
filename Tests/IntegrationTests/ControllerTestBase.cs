@@ -41,7 +41,7 @@ namespace SlidEnglish.Web.IntegrationTests
 			_dal = new DataAccessLayer(
                 _db,
                 new EfRepository<User, string>(_db),
-                new EfWordsRepository(_db),
+                new EfLexicalUnitsRepository(_db),
 				new EfRefreshTokensRepository(_db));
 
 			_user = new User() { Email = "test1@email.com", UserName = "test1@email.com" };

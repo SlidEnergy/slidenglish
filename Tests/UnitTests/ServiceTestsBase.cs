@@ -16,7 +16,7 @@ namespace SlidEnglish.Web.UnitTests
         protected DataAccessLayer _mockedDal;
         protected User _user;
 
-        protected Mock<IWordsRepository> _words;
+        protected Mock<ILexicalUnitsRepository> _words;
         protected Mock<IRepository<User, string>> _users;
 		protected Mock<IRefreshTokensRepository> _refreshTokens;
 
@@ -29,10 +29,10 @@ namespace SlidEnglish.Web.UnitTests
             _dal = new DataAccessLayer(
                 _db,
                 new EfRepository<User, string>(_db),
-                new EfWordsRepository(_db),
+                new EfLexicalUnitsRepository(_db),
 				new EfRefreshTokensRepository(_db));
 
-            _words = new Mock<IWordsRepository>();
+            _words = new Mock<ILexicalUnitsRepository>();
             _users = new Mock<IRepository<User, string>>();
 			_refreshTokens = new Mock<IRefreshTokensRepository>();
 

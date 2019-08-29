@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SlidEnglish.Domain;
 
 namespace SlidEnglish.Infrastructure
 {
-	public class ApplicationDbContext : IdentityDbContext<SlidEnglish.Domain.User>
+    public class ApplicationDbContext : IdentityDbContext<SlidEnglish.Domain.User>
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
@@ -18,25 +15,25 @@ namespace SlidEnglish.Infrastructure
 		{
 			base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Word>()
+            modelBuilder.Entity<LexicalUnit>()
                 .HasIndex(x => x.Text);
 
-            modelBuilder.Entity<WordSynonym>()
-				.HasKey(key => new { key.WordId, key.SynonymId });
+            modelBuilder.Entity<LexicalUnitToLexicalUnitRelation>()
+				.HasKey(key => new { key.LexicalUnitId, key.RelatedLexicalUnitId });
 
-			modelBuilder.Entity<WordSynonym>()
-				.HasOne(e => e.Synonym)
-				.WithMany(e => e.SynonymOf)
-				.HasForeignKey(e => e.SynonymId)
+			modelBuilder.Entity<LexicalUnitToLexicalUnitRelation>()
+				.HasOne(e => e.RelatedLexicalUnit)
+				.WithMany(e => e.RelatedLexicalUnitsOf)
+				.HasForeignKey(e => e.RelatedLexicalUnitId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			modelBuilder.Entity<WordSynonym>()
-				.HasOne(e => e.Word)
-				.WithMany(e => e.Synonyms)
-				.HasForeignKey(e => e.WordId);
+			modelBuilder.Entity<LexicalUnitToLexicalUnitRelation>()
+				.HasOne(e => e.LexicalUnit)
+				.WithMany(e => e.RelatedLexicalUnits)
+				.HasForeignKey(e => e.LexicalUnitId);
 		}
 
-		public DbSet<SlidEnglish.Domain.Word> Words { get; set; }
+		public DbSet<LexicalUnit> LexicalUnits { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }
