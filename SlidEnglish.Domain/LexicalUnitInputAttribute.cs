@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SlidEnglish.Domain
 {
-    public enum WordAttribute
+    public enum LexicalUnitInputAttribute
     {
         None = 0,
 

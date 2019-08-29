@@ -20,19 +20,19 @@ namespace SlidEnglish.App
 
         public async Task ProcessTranslate(string userId, string text)
         {
-            var words = Split(text);
+            var lexicalUnits = Split(text);
 
-            foreach (var word in words)
+            foreach (var lexicalUnit in lexicalUnits)
             {
-                var existWord = await _dal.Words.GetByTextWithAccessCheck(userId, word);
+                var existLexicalUnit = await _dal.LexicalUnits.GetByTextWithAccessCheck(userId, lexicalUnit);
 
-                if (existWord == null)
-                    await AddAsync(userId, word);
+                if (existLexicalUnit == null)
+                    await AddAsync(userId, lexicalUnit);
                 else
                 {
                     // TODO: Add statistics of usages
-                    existWord.Usages++;
-                    await _dal.Words.Update(existWord);
+                    existLexicalUnit.UsagesCount++;
+                    await _dal.LexicalUnits.Update(existLexicalUnit);
                 }
             }
         }
@@ -40,20 +40,21 @@ namespace SlidEnglish.App
         public string[] Split(string text)
         {
             var punctuation = text.Where(Char.IsPunctuation).Distinct().ToArray();
-            var words = text.Split().Select(x => x.Trim(punctuation)).ToArray();
+            var lexicalUnits = text.Split().Select(x => x.Trim(punctuation)).ToArray();
 
-            return words.Length > 2 ? words : new string[] { text };
+            return lexicalUnits.Length > 2 ? lexicalUnits : new string[] { text };
         }
 
-        public async Task AddAsync(string userId, string word)
+        public async Task AddAsync(string userId, string lexicalUnit)
         {
-            var newWord = new Word(word)
+            var newLexicalUnit = new LexicalUnit
             {
+                Text = lexicalUnit,
                 User = await _dal.Users.GetById(userId),
-                Attributes = WordAttribute.TranslateInput
+                InputAttributes = LexicalUnitInputAttribute.TranslateInput
             };
 
-            await _dal.Words.Add(newWord);
+            await _dal.LexicalUnits.Add(newLexicalUnit);
         }
     }
 }

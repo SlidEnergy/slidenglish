@@ -8,33 +8,33 @@ using SlidEnglish.Domain;
 
 namespace SlidEnglish.Web.UnitTests
 {
-    public class WordsControllerTests : TestsBase
+    public class LexicalUnitsControllerTests : TestsBase
     {
-		private WordsController _controller;
+		private LexicalUnitsController _controller;
 
 		[SetUp]
         public void Setup()
         {
-            var service = new WordsService(_mockedDal, _autoMapper.Create(_db));
-			_controller = new WordsController(_autoMapper.Create(_db), service);
+            var service = new LexicalUnitsService(_mockedDal, _autoMapper.Create(_db));
+			_controller = new LexicalUnitsController(_autoMapper.Create(_db), service);
 			_controller.AddControllerContext(_user);
 		}
 
         [Test]
         public async Task GetWords_ShouldReturnList()
         {
-            await _dal.Words.Add(new Word()
+            await _dal.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 User = _user
             });
-            await _dal.Words.Add(new Word()
+            await _dal.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #2",
                 User = _user
             });
 
-            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Words.ToList());
+            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.LexicalUnits.ToList());
 
             var result = await _controller.GetList();
 
@@ -44,7 +44,7 @@ namespace SlidEnglish.Web.UnitTests
         [Test]
         public async Task GetEmptyWordsList_ShouldBeEmptyListReturned()
         {
-            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Words.ToList());
+            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.LexicalUnits.ToList());
 
             var result = await _controller.GetList();
 

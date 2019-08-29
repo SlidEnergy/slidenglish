@@ -9,18 +9,18 @@ namespace SlidEnglish.Infrastructure
 		private readonly ApplicationDbContext _context;
 
         public IRefreshTokensRepository RefreshTokens { get; }
-        public IWordsRepository Words { get; }
+        public ILexicalUnitsRepository LexicalUnits { get; }
 		public IRepository<User, string> Users { get; }
 
 		public DataAccessLayer(
 			ApplicationDbContext context,
 			IRepository<User, string> users,
-            IWordsRepository words,
+            ILexicalUnitsRepository lexicalUnits,
             IRefreshTokensRepository refreshTokens)
 		{
 			_context = context;
 			Users = users;
-			Words = words;
+			LexicalUnits = lexicalUnits;
             RefreshTokens = refreshTokens;
         }
 

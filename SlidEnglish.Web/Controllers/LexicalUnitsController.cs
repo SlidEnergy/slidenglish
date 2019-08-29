@@ -10,45 +10,45 @@ namespace SlidEnglish.Web
     [Authorize]
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class WordsController : ControllerBase
+    public class LexicalUnitsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly WordsService _wordsService;
+        private readonly LexicalUnitsService _lexicalUnitsService;
 
-        public WordsController(IMapper mapper, WordsService wordsService)
+        public LexicalUnitsController(IMapper mapper, LexicalUnitsService lexicalUnitsService)
         {
             _mapper = mapper;
-            _wordsService = wordsService;
+            _lexicalUnitsService = lexicalUnitsService;
         }
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<App.Dto.Word[]>> GetList()
+        public async Task<ActionResult<App.Dto.LexicalUnit[]>> GetList()
         {
             var userId = User.GetUserId();
 
-			return await _wordsService.GetListAsync(userId);
+			return await _lexicalUnitsService.GetListAsync(userId);
         }
 
         [HttpPost]
-        public async Task<ActionResult<App.Dto.Word>> Add(App.Dto.Word word)
+        public async Task<ActionResult<App.Dto.LexicalUnit>> Add(App.Dto.LexicalUnit word)
         {
             var userId = User.GetUserId();
 
-            var newBank = await _wordsService.AddAsync(userId, word);
+            var newBank = await _lexicalUnitsService.AddAsync(userId, word);
 
             return CreatedAtAction("GetList", newBank);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<App.Dto.Word>> Update(int id, App.Dto.Word word)
+        public async Task<ActionResult<App.Dto.LexicalUnit>> Update(int id, App.Dto.LexicalUnit lexicalUnit)
         {
             var userId = User.GetUserId();
 
-            if (id != word.Id)
+            if (id != lexicalUnit.Id)
                 return BadRequest();
 
-            return await _wordsService.UpdateAsync(userId, word);
+            return await _lexicalUnitsService.UpdateAsync(userId, lexicalUnit);
         }
 
         [HttpDelete("{id}")]
@@ -56,7 +56,7 @@ namespace SlidEnglish.Web
         {
             var userId = User.GetUserId();
 
-            await _wordsService.DeleteAsync(userId, id);
+            await _lexicalUnitsService.DeleteAsync(userId, id);
 
             return NoContent();
         }

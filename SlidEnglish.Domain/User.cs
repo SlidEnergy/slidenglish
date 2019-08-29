@@ -9,6 +9,6 @@ namespace SlidEnglish.Domain
 	public class User : IdentityUser, IUniqueObject<string>
 	{
 		[Required]
-		public virtual ICollection<Word> Words { get; set; } = new List<Word>();
+		public virtual ICollection<LexicalUnit> LexicalUnits { get; set; } = new List<LexicalUnit>();
 	}
 }
