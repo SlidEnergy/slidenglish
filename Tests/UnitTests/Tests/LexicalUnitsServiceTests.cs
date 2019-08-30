@@ -24,7 +24,8 @@ namespace SlidEnglish.Web.UnitTests
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
             _words.Setup(x => x.Add(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
 
-			var word = new App.Dto.LexicalUnit() {
+			var word = new App.Dto.LexicalUnit()
+            {
 				Text = "Word #1",
 				Association = "Association #1",
 				Notes = "Description #1"
@@ -41,7 +42,26 @@ namespace SlidEnglish.Web.UnitTests
 				c.User.Id == _user.Id)), Times.Exactly(1));
         }
 
-		[Test]
+        [Test]
+        public async Task AddWordWithExamplesOfUse_ShouldCallAddMethodWithRightArguments()
+        {
+            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
+            _words.Setup(x => x.Add(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
+
+            var word = new App.Dto.LexicalUnit()
+            {
+                Text = "Word #1",
+                ExamplesOfUse = new[] { new ExampleOfUse { Example = "Sentence #1" } }
+            };
+
+            await _service.AddAsync(_user.Id, word);
+
+            _words.Verify(x => x.Add(It.Is<LexicalUnit>(c =>
+                c.Id == word.Id &&
+                c.ExamplesOfUse != null && c.ExamplesOfUse.Count == 1 && c.ExamplesOfUse[0].Example == word.ExamplesOfUse[0].Example &&
+                c.User.Id == _user.Id)), Times.Exactly(1));
+        }
+        [Test]
 		public async Task AddWordWithRelatedWord_ShouldCallAddMethodWithRightArguments()
 		{
 			var word1 = await _dal.LexicalUnits.Add(new LexicalUnit()
@@ -53,7 +73,7 @@ namespace SlidEnglish.Web.UnitTests
 			var word2 = new App.Dto.LexicalUnit()
 			{
 				Text = "Word #1",
-				RelatedLexicalUnits = new App.Dto.LexicalUnitRelation[] { new App.Dto.LexicalUnitRelation() { LexicalUnitId = word1.Id } }
+				RelatedLexicalUnits = new [] { new App.Dto.LexicalUnitRelation() { LexicalUnitId = word1.Id } }
 			};
 
 			_users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
@@ -65,7 +85,7 @@ namespace SlidEnglish.Web.UnitTests
 			_words.Verify(x => x.Add(It.Is<LexicalUnit>(c => 
 				c.Id == word2.Id &&
 				c.Text == word2.Text && 
-				c.RelatedLexicalUnits != null && c.RelatedLexicalUnits.Count() > 0 && c.RelatedLexicalUnits[0].RelatedLexicalUnitId == word1.Id &&
+				c.RelatedLexicalUnits != null && c.RelatedLexicalUnits.Count() == 1 && c.RelatedLexicalUnits[0].RelatedLexicalUnitId == word1.Id &&
 				c.User.Id == _user.Id)), Times.Exactly(1));
 		}
 
@@ -101,7 +121,37 @@ namespace SlidEnglish.Web.UnitTests
 				c.User.Id == _user.Id)), Times.Exactly(1));
 		}
 
-		[Test]
+        [Test]
+        public async Task UpdateWordWithExamplesOfUse_ShouldCallUpdateMethodWithRightArguments()
+        {
+            var word = await _dal.LexicalUnits.Add(new LexicalUnit()
+            {
+                Text = "Word #1",
+                ExamplesOfUse = new[] { new ExampleOfUse { Example = "Sentence #1" }, new ExampleOfUse { Example = "Sentence #2" } },
+                User = _user
+            });
+
+            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
+            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(word);
+            _words.Setup(x => x.Update(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
+
+            var updatedWord = new App.Dto.LexicalUnit()
+            {
+                Id = word.Id,
+                ExamplesOfUse = new[] { new ExampleOfUse { Example = "Sentence #1" }, new ExampleOfUse { Example = "Sentence #3" } },
+            };
+
+            var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
+
+            _words.Verify(x => x.Update(
+                It.Is<LexicalUnit>(c =>
+                c.Id == updatedWord.Id &&
+                c.ExamplesOfUse != null && 
+                c.ExamplesOfUse.Where(example => updatedWord.ExamplesOfUse.Select(example2 => example2.Example).Contains(example.Example)).Count() == 2 &&
+                c.User.Id == _user.Id)), Times.Exactly(1));
+        }
+
+        [Test]
 		public async Task UpdateWordWithDirectRelatedWords_ShouldCallUpdateMethodWithRightArguments()
 		{
 			var word1 = await _dal.LexicalUnits.Add(new LexicalUnit()

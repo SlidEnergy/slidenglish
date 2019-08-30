@@ -26,6 +26,8 @@ namespace SlidEnglish.Web
                     opt => opt.MapFrom(src => src.Association ?? ""))
                 .ForMember(dest => dest.Notes,
                     opt => opt.MapFrom(src => src.Notes ?? ""))
+                .ForMember(dest => dest.ExamplesOfUse,
+                    opt => opt.MapFrom(src => src.ExamplesOfUse))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
 			CreateMap<LexicalUnit, App.Dto.LexicalUnit>()

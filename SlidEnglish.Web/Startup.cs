@@ -141,9 +141,13 @@ namespace SlidEnglish.Web
 				});
 				c.AddSecurityDefinition("Bearer", new ApiKeyScheme { In = "header", Description = "Please enter JWT with Bearer into field", Name = "Authorization", Type = "apiKey" });
 
+                c.DescribeAllEnumsAsStrings();
+
 				c.OperationFilter<ResponseWithDescriptionOperationFilter>();
 				c.OperationFilter<SecurityRequirementsOperationFilter>();
-			});
+
+                c.SchemaFilter<EnumAsModelSchemaFilter>();
+            });
 
 			// AddIdentity и AddDefaultIdentity добавляют много чего лишнего. Ссылки для сранения.
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
