@@ -15,7 +15,7 @@ namespace SlidEnglish.Web.UnitTests
 		[SetUp]
         public void Setup()
         {
-            var service = new LexicalUnitsService(_mockedDal, _autoMapper.Create(_db));
+            var service = new LexicalUnitsService(_mockedDal, _autoMapper.Create(_db), _mockedContext.Object);
 			_controller = new LexicalUnitsController(_autoMapper.Create(_db), service);
 			_controller.AddControllerContext(_user);
 		}

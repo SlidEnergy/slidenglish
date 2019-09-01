@@ -11,12 +11,14 @@ namespace SlidEnglish.App
 	{
 		private IDataAccessLayer _dal;
 		private IMapper _mapper;
+        private readonly IApplicationDbContext _context;
 
-		public LexicalUnitsService(IDataAccessLayer dal, IMapper mapper)
+        public LexicalUnitsService(IDataAccessLayer dal, IMapper mapper, IApplicationDbContext context)
 		{
 			_dal = dal;
 			_mapper = mapper;
-		}
+            _context = context;
+        }
 
         public async Task<Dto.LexicalUnit> AddAsync(string userId, Dto.LexicalUnit lexicalUnit)
 		{

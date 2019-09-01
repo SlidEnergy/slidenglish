@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SlidEnglish.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace SlidEnglish.Web.UnitTests
 {
@@ -15,12 +16,14 @@ namespace SlidEnglish.Web.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new LexicalUnitsService(_mockedDal, _autoMapper.Create(_db));
+            _service = new LexicalUnitsService(_mockedDal, _autoMapper.Create(_db), _mockedContext.Object);
         }
 
         [Test]
         public async Task AddWord_ShouldCallAddMethodWithRightArguments()
         {
+            
+
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
             _words.Setup(x => x.Add(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
 

@@ -5,6 +5,8 @@ using SlidEnglish.Infrastructure;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using SlidEnglish.Domain;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace SlidEnglish.Web.UnitTests
 {
@@ -19,6 +21,7 @@ namespace SlidEnglish.Web.UnitTests
         protected Mock<ILexicalUnitsRepository> _words;
         protected Mock<IRepository<User, string>> _users;
 		protected Mock<IRefreshTokensRepository> _refreshTokens;
+        protected Mock<IApplicationDbContext> _mockedContext;
 
         [SetUp]
         public async Task SetupBase()
@@ -39,6 +42,19 @@ namespace SlidEnglish.Web.UnitTests
 			_mockedDal = new DataAccessLayer(_db, _users.Object, _words.Object, _refreshTokens.Object);
 
             _user = await _dal.Users.Add(new User() { Email = "test1@email.com" });
+
+            var users = new List<User>
+            {
+                _user
+            }.AsQueryable();
+
+            _mockedContext = new Mock<IApplicationDbContext>();
+            var usersMock = new Mock<DbSet<User>>();
+            usersMock.As<IQueryable<User>>().Setup(m => m.Provider).Returns(users.Provider);
+            usersMock.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.Expression);
+            usersMock.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.ElementType);
+            usersMock.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
+            _mockedContext.Setup(x => x.Users).Returns(usersMock.Object);
         }
     }
 }
