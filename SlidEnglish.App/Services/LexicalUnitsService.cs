@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SlidEnglish.App
 {
@@ -26,14 +27,17 @@ namespace SlidEnglish.App
 
 			var newLexicalUnit = _mapper.Map<LexicalUnit>(dto);
 
-			newLexicalUnit.User = await _dal.Users.GetById(userId);
+            //newLexicalUnit.User = await _dal.Users.GetById(userId);
+            newLexicalUnit.User = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
             newLexicalUnit.InputAttributes = LexicalUnitInputAttribute.UserInput;
 
             if (dto.RelatedLexicalUnits != null && dto.RelatedLexicalUnits.Length > 0)
                 await AddRelatedLexicalUnits(userId, newLexicalUnit, dto);
 
-            await _dal.LexicalUnits.Add(newLexicalUnit);
+            await _context.LexicalUnits.AddAsync(newLexicalUnit);
+            //await _dal.LexicalUnits.Add(newLexicalUnit);
 
+            await _context.SaveChangesAsync();
 			return _mapper.Map<Dto.LexicalUnit>(newLexicalUnit);
 		}
 
@@ -43,7 +47,8 @@ namespace SlidEnglish.App
 
             foreach (var relation in dto.RelatedLexicalUnits)
             {
-                var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                //var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                var linkedLexicalUnit = await _context.LexicalUnits.FirstOrDefaultAsync(x => x.User.Id == userId && x.Id == relation.LexicalUnitId);
                 newLexicalUnit.RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(newLexicalUnit, linkedLexicalUnit));
             }
         }

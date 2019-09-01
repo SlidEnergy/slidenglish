@@ -43,18 +43,21 @@ namespace SlidEnglish.Web.UnitTests
 
             _user = await _dal.Users.Add(new User() { Email = "test1@email.com" });
 
-            var users = new List<User>
-            {
-                _user
-            }.AsQueryable();
+            var usersMock = CreateMockedDbSet<User>(new[] { _user }.AsQueryable());
 
             _mockedContext = new Mock<IApplicationDbContext>();
-            var usersMock = new Mock<DbSet<User>>();
-            usersMock.As<IQueryable<User>>().Setup(m => m.Provider).Returns(users.Provider);
-            usersMock.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.Expression);
-            usersMock.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.ElementType);
-            usersMock.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
             _mockedContext.Setup(x => x.Users).Returns(usersMock.Object);
+        }
+
+        private Mock<DbSet<T>> CreateMockedDbSet<T>(IQueryable<T> data) where T : class
+        {
+            var mock = new Mock<DbSet<T>>();
+            mock.As<IQueryable<T>>().Setup(m => m.Provider).Returns(data.Provider);
+            mock.As<IQueryable<T>>().Setup(m => m.Expression).Returns(data.Expression);
+            mock.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(data.ElementType);
+            mock.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+
+            return mock;
         }
     }
 }
