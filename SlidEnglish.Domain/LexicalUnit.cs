@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -50,5 +51,13 @@ namespace SlidEnglish.Domain
         public bool IsPhrase => Text.Split(' ').Length > 1;
 
         public LexicalUnit() { }
+
+        public void AddRelatedLexicalUnit(LexicalUnit relatedLexicalUnit)
+        {
+            if (Id <= 0)
+                throw new InvalidOperationException();
+
+            RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(this, relatedLexicalUnit));
+        }
 	}
 }

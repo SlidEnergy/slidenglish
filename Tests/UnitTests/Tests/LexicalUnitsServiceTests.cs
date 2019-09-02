@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SlidEnglish.Domain;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace SlidEnglish.Web.UnitTests
 {
@@ -102,8 +103,10 @@ namespace SlidEnglish.Web.UnitTests
         {
             var word = _db.LexicalUnits.Add(new LexicalUnit()
             {
-                Text = "Word #1",
-                ExamplesOfUse = new[] { new ExampleOfUse { Example = "Sentence #1" }, new ExampleOfUse { Example = "Sentence #2" } },
+                Text = Guid.NewGuid().ToString(),
+                ExamplesOfUse = new[] {
+                    new ExampleOfUse { Example = "Sentence #1" },
+                    new ExampleOfUse { Example = "Sentence #2" } },
                 User = _user
             }).Entity;
 
@@ -151,7 +154,7 @@ namespace SlidEnglish.Web.UnitTests
             var word1 = _factory.CreateLexicalUnit(_user);
             var word2 = _factory.CreateLexicalUnit(_user);
 
-            word2.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word2, word1) };
+            word2.AddRelatedLexicalUnit(word1);
             _db.SaveChanges();
 
             var updatedWord = new App.Dto.LexicalUnit()
@@ -173,25 +176,15 @@ namespace SlidEnglish.Web.UnitTests
         {
             var word1 = _factory.CreateLexicalUnit(_user);
             var word2 = _factory.CreateLexicalUnit(_user);
-
-            word1.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word1, word2) };
-            _db.SaveChanges();
-
             var word3 = _factory.CreateLexicalUnit(_user);
-
-            word3.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word3, word1) };
-            _db.SaveChanges();
-
-            var word4 = _db.LexicalUnits.Add(new LexicalUnit()
-            {
-                Text = "Word #4",
-                User = _user,
-            }).Entity;
-            _db.SaveChanges();
-            word4.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word4, word1) };
-            _db.SaveChanges();
-
+            var word4 = _factory.CreateLexicalUnit(_user);
             var word5 = _factory.CreateLexicalUnit(_user);
+
+            word1.AddRelatedLexicalUnit(word2);
+            word3.AddRelatedLexicalUnit(word1);
+            word4.AddRelatedLexicalUnit(word1);
+
+            _db.SaveChanges();
 
             var updatedWord = new App.Dto.LexicalUnit()
             {
