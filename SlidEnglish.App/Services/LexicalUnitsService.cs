@@ -4,36 +4,40 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SlidEnglish.App
 {
-	public class LexicalUnitsService
-	{
-		private IDataAccessLayer _dal;
-		private IMapper _mapper;
+    public class LexicalUnitsService : ILexicalUnitsService
+    {
+        private IMapper _mapper;
+        private readonly IApplicationDbContext _context;
 
-		public LexicalUnitsService(IDataAccessLayer dal, IMapper mapper)
-		{
-			_dal = dal;
-			_mapper = mapper;
-		}
+        public LexicalUnitsService(IMapper mapper, IApplicationDbContext context)
+        {
+            _mapper = mapper;
+            _context = context;
+        }
 
         public async Task<Dto.LexicalUnit> AddAsync(string userId, Dto.LexicalUnit lexicalUnit)
-		{
+        {
             var dto = lexicalUnit;
 
-			var newLexicalUnit = _mapper.Map<LexicalUnit>(dto);
+            var newLexicalUnit = _mapper.Map<LexicalUnit>(dto);
 
-			newLexicalUnit.User = await _dal.Users.GetById(userId);
+            //newLexicalUnit.User = await _dal.Users.GetById(userId);
+            newLexicalUnit.User = await _context.Users.FindAsync(userId);
             newLexicalUnit.InputAttributes = LexicalUnitInputAttribute.UserInput;
 
             if (dto.RelatedLexicalUnits != null && dto.RelatedLexicalUnits.Length > 0)
                 await AddRelatedLexicalUnits(userId, newLexicalUnit, dto);
 
-            await _dal.LexicalUnits.Add(newLexicalUnit);
+            _context.LexicalUnits.Add(newLexicalUnit);
+            //await _dal.LexicalUnits.Add(newLexicalUnit);
 
-			return _mapper.Map<Dto.LexicalUnit>(newLexicalUnit);
-		}
+            await _context.SaveChangesAsync();
+            return _mapper.Map<Dto.LexicalUnit>(newLexicalUnit);
+        }
 
         private async Task AddRelatedLexicalUnits(string userId, LexicalUnit newLexicalUnit, Dto.LexicalUnit dto)
         {
@@ -41,43 +45,36 @@ namespace SlidEnglish.App
 
             foreach (var relation in dto.RelatedLexicalUnits)
             {
-                var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                //var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FindAsync(relation.LexicalUnitId);
                 newLexicalUnit.RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(newLexicalUnit, linkedLexicalUnit));
             }
         }
 
-		public Task<LexicalUnit> GetAsync(string userId, int id)
-		{
-			return _dal.LexicalUnits.GetByIdWithAccessCheck(userId, id);
-		}
-
-        public Task<LexicalUnit> GetAsync(string userId, string text)
+        public async Task<Dto.LexicalUnit[]> GetListAsync(string userId)
         {
-            return _dal.LexicalUnits.GetByTextWithAccessCheck(userId, text);
+            var lexicalUnit = await _context.LexicalUnits.ByUser(userId).ToListAsync();
+
+            return _mapper.Map<Dto.LexicalUnit[]>(lexicalUnit);
         }
 
-        public async Task<Dto.LexicalUnit[]> GetListAsync(string userId)
-		{
-			var lexicalUnit = await _dal.LexicalUnits.GetListWithAccessCheck(userId);
-
-			return _mapper.Map<Dto.LexicalUnit[]>(lexicalUnit);
-		}
-
-		public async Task<Dto.LexicalUnit> UpdateAsync(string userId, Dto.LexicalUnit lexicalUnit)
-		{
+        public async Task<Dto.LexicalUnit> UpdateAsync(string userId, Dto.LexicalUnit lexicalUnit)
+        {
             var dto = lexicalUnit;
 
-			var editLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, dto.Id);
+            //var editLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, dto.Id);
+            var editLexicalUnit = await _context.LexicalUnits.FirstAsync(x => x.User.Id == userId && x.Id == dto.Id);
 
             _mapper.Map<Dto.LexicalUnit, LexicalUnit>(dto, editLexicalUnit);
 
             await UpdateRelatedLexicalUnits(userId, editLexicalUnit, dto);
             UpdateExamplesOfUse(editLexicalUnit, dto);
 
-            await _dal.LexicalUnits.Update(editLexicalUnit);
+            //await _dal.LexicalUnits.Update(editLexicalUnit);
+            await _context.SaveChangesAsync();
 
-			return _mapper.Map<Dto.LexicalUnit>(editLexicalUnit);
-		}
+            return _mapper.Map<Dto.LexicalUnit>(editLexicalUnit);
+        }
 
         public async Task UpdateRelatedLexicalUnits(string userId, LexicalUnit editLexicalUnit, Dto.LexicalUnit dto)
         {
@@ -96,12 +93,14 @@ namespace SlidEnglish.App
                     if (editLexicalUnit.RelatedLexicalUnitsOf.Any(x => x.LexicalUnitId == relation.LexicalUnitId &&
                         x.RelatedLexicalUnitId == editLexicalUnit.Id))
                     {
-                        var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                        //var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                        var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FirstAsync(x => x.Id == relation.LexicalUnitId);
                         relatedLexicalUnitsOf.Add(new LexicalUnitToLexicalUnitRelation(linkedLexicalUnit, editLexicalUnit));
                     }
                     else
                     {
-                        var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                        //var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
+                        var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FirstAsync(x => x.Id == relation.LexicalUnitId);
                         relatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(editLexicalUnit, linkedLexicalUnit));
                     }
                 }
@@ -137,18 +136,15 @@ namespace SlidEnglish.App
             editLexicalUnit.ExamplesOfUse = examplesOfUse;
         }
 
-        public async Task<bool> ExistsAsync(string userId, string lexicalUnit) => await _dal.LexicalUnits.GetByTextWithAccessCheck(userId, lexicalUnit) != null;
+        public async Task DeleteAsync(string userId, int id)
+        {
+            var lexicalUnit = await _context.LexicalUnits.ByUser(userId).FindAsync(id);
 
-        public async Task<bool> ExistsAsync(string userId, LexicalUnit lexicalUnit) => await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, lexicalUnit.Id) != null;
+            if (lexicalUnit == null)
+                throw new EntityNotFoundException();
 
-		public async Task DeleteAsync(string userId, int id)
-		{
-			var lexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, id);
-
-			if (lexicalUnit == null)
-				throw new EntityNotFoundException();
-
-			await _dal.LexicalUnits.Delete(lexicalUnit);
-		}
-	}
+            _context.LexicalUnits.Remove(lexicalUnit);
+            await _context.SaveChangesAsync();
+        }
+    }
 }

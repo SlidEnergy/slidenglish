@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 
 namespace SlidEnglish.App
 {
-	public class UsersService
+    public class UsersService : IUsersService
     {
         private readonly UserManager<User> _userManager;
         private readonly ITokenGenerator _tokenGenerator;
-		private readonly TokenService _tokenService;
+        private readonly ITokenService _tokenService;
 
-		public UsersService(UserManager<User> userManager, ITokenGenerator tokenGenerator, TokenService tokenService)
+        public UsersService(UserManager<User> userManager, ITokenGenerator tokenGenerator, ITokenService tokenService)
         {
-			_tokenService = tokenService;
-			_userManager = userManager;
+            _tokenService = tokenService;
+            _userManager = userManager;
             _tokenGenerator = tokenGenerator;
         }
 
@@ -40,8 +40,8 @@ namespace SlidEnglish.App
             if (!checkResult)
                 throw new AuthenticationException();
 
-			var refreshToken = _tokenGenerator.GenerateRefreshToken();
-			await _tokenService.AddRefreshToken(refreshToken, user);
+            var refreshToken = _tokenGenerator.GenerateRefreshToken();
+            await _tokenService.AddRefreshToken(refreshToken, user);
 
             return new TokensCortage()
             {

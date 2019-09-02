@@ -1,17 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
-using SlidEnglish.Web;
-using SlidEnglish.App;
+﻿using Moq;
 using NUnit.Framework;
+using SlidEnglish.App;
 using System.Threading.Tasks;
-using SlidEnglish.Domain;
 
 namespace SlidEnglish.Web.UnitTests
 {
-	public class TokenControllerTests : TestsBase
+    public class TokenControllerTests : TestsBase
     {
-        Mock<UserManager<User>> _manager;
+        Mock<ITokenService> _service;
 		TokenController _controller;
 		TokenGenerator _tokenGenerator;
 
@@ -20,33 +16,24 @@ namespace SlidEnglish.Web.UnitTests
         {
 			var authSettings = SettingsFactory.CreateAuth();
 			_tokenGenerator = new TokenGenerator(authSettings);
-            var store = new Mock<IUserStore<User>>();
 
-            _manager = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new TokenService(_mockedDal.RefreshTokens, _tokenGenerator, authSettings);
+            _service = new Mock<ITokenService>();
 
-			_controller = new TokenController(tokenService);
+			_controller = new TokenController(_service.Object);
 			_controller.AddControllerContext(_user);
 		}
 
         [Test]
-        public async Task RefreshToken_ShouldReturnTokens()
+        public async Task RefreshToken_ShouldCallMethod()
         {
 			var token = _tokenGenerator.GenerateAccessToken(_user);
 			var refreshToken = _tokenGenerator.GenerateRefreshToken();
 
-			_refreshTokens.Setup(x => x.GetByUserId(It.IsAny<string>())).ReturnsAsync(new RefreshToken("any", refreshToken, _user));
+            _service.Setup(x => x.RefreshToken(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new TokensCortage());
 			
 			var result = await _controller.Refresh(token, refreshToken);
 
-            Assert.IsInstanceOf<ActionResult<Dto.TokenInfo>>(result);
-
-            Assert.NotNull(result.Value.Token);
-            Assert.NotNull(result.Value.RefreshToken);
-			Assert.IsNotEmpty(result.Value.Token);
-			Assert.IsNotEmpty(result.Value.RefreshToken);
-			Assert.AreNotEqual(refreshToken, result.Value.Token);
-			Assert.IsNotEmpty(refreshToken, result.Value.RefreshToken);
+            _service.Verify(x => x.RefreshToken(It.Is<string>(a => a == token), It.Is<string>(a => a == refreshToken)), Times.Once);
 		}
 	}
 }
