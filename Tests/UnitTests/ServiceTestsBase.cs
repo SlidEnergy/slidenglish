@@ -14,50 +14,17 @@ namespace SlidEnglish.Web.UnitTests
     {
         protected readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
         protected ApplicationDbContext _db;
-        protected DataAccessLayer _dal;
-        protected DataAccessLayer _mockedDal;
         protected User _user;
 
-        protected Mock<ILexicalUnitsRepository> _words;
-        protected Mock<IRepository<User, string>> _users;
-		protected Mock<IRefreshTokensRepository> _refreshTokens;
-        protected Mock<IApplicationDbContext> _mockedContext;
-
         [SetUp]
-        public async Task SetupBase()
+        public void SetupBase()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase(TestContext.CurrentContext.Test.Name);
             _db = new ApplicationDbContext(optionsBuilder.Options);
-            _dal = new DataAccessLayer(
-                _db,
-                new EfRepository<User, string>(_db),
-                new EfLexicalUnitsRepository(_db),
-				new EfRefreshTokensRepository(_db));
 
-            _words = new Mock<ILexicalUnitsRepository>();
-            _users = new Mock<IRepository<User, string>>();
-			_refreshTokens = new Mock<IRefreshTokensRepository>();
-
-			_mockedDal = new DataAccessLayer(_db, _users.Object, _words.Object, _refreshTokens.Object);
-
-            _user = await _dal.Users.Add(new User() { Email = "test1@email.com" });
-
-            var usersMock = CreateMockedDbSet<User>(new[] { _user }.AsQueryable());
-
-            _mockedContext = new Mock<IApplicationDbContext>();
-            _mockedContext.Setup(x => x.Users).Returns(usersMock.Object);
-        }
-
-        private Mock<DbSet<T>> CreateMockedDbSet<T>(IQueryable<T> data) where T : class
-        {
-            var mock = new Mock<DbSet<T>>();
-            mock.As<IQueryable<T>>().Setup(m => m.Provider).Returns(data.Provider);
-            mock.As<IQueryable<T>>().Setup(m => m.Expression).Returns(data.Expression);
-            mock.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(data.ElementType);
-            mock.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
-
-            return mock;
+            _user = _db.Users.Add(new User() { Email = "test1@email.com" }).Entity;
+            _db.SaveChanges();
         }
     }
 }

@@ -4,27 +4,29 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SlidEnglish.App
 {
-	public class TokenService
+    public class TokenService : ITokenService
     {
-        private readonly IRefreshTokensRepository _repository;
+        private readonly IApplicationDbContext _context;
         private readonly ITokenGenerator _tokenGenerator;
-		private readonly AuthSettings _authSettings;
+        private readonly AuthSettings _authSettings;
 
-		public TokenService(IRefreshTokensRepository repository, ITokenGenerator tokenGenerator, AuthSettings authSettings)
+        public TokenService(IApplicationDbContext context, ITokenGenerator tokenGenerator, AuthSettings authSettings)
         {
-            _repository = repository;
+            _context = context;
             _tokenGenerator = tokenGenerator;
-			_authSettings = authSettings;
-		}
+            _authSettings = authSettings;
+        }
 
         public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
         {
             var principal = GetPrincipalFromExpiredToken(token);
             var userId = principal.GetUserId();
-			var savedToken = await _repository.GetByUserId(userId);
+            var savedToken = await _context.RefreshTokens.ByUser(userId).FirstAsync();
 
             if (savedToken == null || savedToken.Token != refreshToken)
                 throw new SecurityTokenException("Invalid refresh token");
@@ -37,23 +39,25 @@ namespace SlidEnglish.App
             return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
         }
 
-		public async Task<RefreshToken> AddRefreshToken(string refreshToken, User user)
-		{
-			var token = new RefreshToken("any", refreshToken, user);
-			await _repository.Add(token);
-			return token;
-		}
-
-		private async Task UpdateRefreshToken(string userId, string refreshToken)
+        public async Task<RefreshToken> AddRefreshToken(string refreshToken, User user)
         {
-            var token = await _repository.GetByUserId(userId);
-			token.Update("any", refreshToken);
-            await _repository.Update(token);
+            var token = new RefreshToken("any", refreshToken, user);
+            _context.RefreshTokens.Add(token);
+            await _context.SaveChangesAsync();
+            return token;
+        }
+
+        private async Task UpdateRefreshToken(string userId, string refreshToken)
+        {
+            var token = await _context.RefreshTokens.ByUser(userId).FirstAsync();
+            token.Update("any", refreshToken);
+            _context.RefreshTokens.Update(token);
+            await _context.SaveChangesAsync();
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
-			var tokenValidationParameters = new TokenValidationParameters
+            var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
                 ValidateIssuer = false,

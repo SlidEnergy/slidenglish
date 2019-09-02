@@ -16,11 +16,11 @@ namespace SlidEnglish.Web.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new LexicalUnitsService(_mockedDal, _autoMapper.Create(_db), _db);
+            _service = new LexicalUnitsService(_autoMapper.Create(_db), _db);
         }
 
         [Test]
-        public async Task AddWord_ShouldCallAddMethodWithRightArguments()
+        public async Task AddWord_ShouldBeAdded()
         { 
             var word = new App.Dto.LexicalUnit()
             {
@@ -41,7 +41,7 @@ namespace SlidEnglish.Web.UnitTests
         }
 
         [Test]
-        public async Task AddWordWithExamplesOfUse_ShouldCallAddMethodWithRightArguments()
+        public async Task AddWordWithExamplesOfUse_ShouldBeAdded()
         {
             var word = new App.Dto.LexicalUnit()
             {
@@ -53,7 +53,7 @@ namespace SlidEnglish.Web.UnitTests
         }
 
         [Test]
-        public async Task AddWordWithRelatedWord_ShouldCallAddMethodWithRightArguments()
+        public async Task AddWordWithRelatedWord_ShouldBeAdded()
         {
             var word1 = _db.LexicalUnits.Add(new LexicalUnit()
             {
@@ -78,17 +78,14 @@ namespace SlidEnglish.Web.UnitTests
         }
 
         [Test]
-        public async Task UpdateWord_ShouldCallUpdateMethodWithRightArguments()
+        public async Task UpdateWord_ShouldBeUpdated()
         {
-            var word = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 User = _user
-            });
-
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(word);
-            _words.Setup(x => x.Update(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
+            }).Entity;
+            _db.SaveChanges();
 
             var updatedWord = new App.Dto.LexicalUnit()
             {
@@ -100,28 +97,24 @@ namespace SlidEnglish.Web.UnitTests
 
             await _service.UpdateAsync(_user.Id, updatedWord);
 
-            _words.Verify(x => x.Update(
-                It.Is<LexicalUnit>(c =>
-                c.Id == updatedWord.Id &&
-                c.Text == updatedWord.Text &&
-                c.Association == updatedWord.Association &&
-                c.Notes == updatedWord.Notes &&
-                c.User.Id == _user.Id)), Times.Exactly(1));
+            Assert.NotNull(_db.LexicalUnits.FirstOrDefault(x=>
+                x.Id == updatedWord.Id &&
+                x.Text == updatedWord.Text &&
+                x.Association == updatedWord.Association &&
+                x.Notes == updatedWord.Notes &&
+                x.User.Id == _user.Id));
         }
 
         [Test]
-        public async Task UpdateWordWithExamplesOfUse_ShouldCallUpdateMethodWithRightArguments()
+        public async Task UpdateWordWithExamplesOfUse_ShouldBeUpdated()
         {
-            var word = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 ExamplesOfUse = new[] { new ExampleOfUse { Example = "Sentence #1" }, new ExampleOfUse { Example = "Sentence #2" } },
                 User = _user
-            });
-
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(word);
-            _words.Setup(x => x.Update(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
+            }).Entity;
+            _db.SaveChanges();
 
             var updatedWord = new App.Dto.LexicalUnit()
             {
@@ -131,37 +124,32 @@ namespace SlidEnglish.Web.UnitTests
 
             var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
 
-            _words.Verify(x => x.Update(
-                It.Is<LexicalUnit>(c =>
-                c.Id == updatedWord.Id &&
-                c.ExamplesOfUse != null &&
-                c.ExamplesOfUse.Where(example => updatedWord.ExamplesOfUse.Select(example2 => example2.Example).Contains(example.Example)).Count() == 2 &&
-                c.User.Id == _user.Id)), Times.Exactly(1));
+            Assert.NotNull(_db.LexicalUnits.FirstOrDefault(x =>
+                x.Id == updatedWord.Id &&
+                x.ExamplesOfUse != null &&
+                x.ExamplesOfUse.Where(example => updatedWord.ExamplesOfUse.Select(example2 => example2.Example).Contains(example.Example)).Count() == 2 &&
+                x.User.Id == _user.Id));
         }
 
         [Test]
-        public async Task UpdateWordWithDirectRelatedWords_ShouldCallUpdateMethodWithRightArguments()
+        public async Task UpdateWordWithDirectRelatedWords_ShouldBeUpdated()
         {
-            var word1 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word1 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 User = _user
-            });
-            var word2 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            }).Entity;
+            var word2 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #2",
                 User = _user
-            });
-            var word3 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            }).Entity;
+            var word3 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #3",
                 User = _user,
-            });
-
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word1.Id))).ReturnsAsync(word1);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word2.Id))).ReturnsAsync(word2);
-            _words.Setup(x => x.Update(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
+            }).Entity;
+            _db.SaveChanges();
 
             var updatedWord = new App.Dto.LexicalUnit()
             {
@@ -171,39 +159,28 @@ namespace SlidEnglish.Web.UnitTests
 
             var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
 
-            _words.Verify(x => x.Update(
-                It.Is<LexicalUnit>(c =>
-                c.Id == updatedWord.Id &&
-                c.RelatedLexicalUnits != null && c.RelatedLexicalUnits.Count() > 0 && c.RelatedLexicalUnits[0].RelatedLexicalUnitId == word2.Id && c.RelatedLexicalUnits[0].LexicalUnitId == word1.Id &&
-                c.User.Id == _user.Id)), Times.Exactly(1));
+            Assert.NotNull(_db.LexicalUnits.FirstOrDefault(x =>
+                x.Id == updatedWord.Id &&
+                x.RelatedLexicalUnits != null && x.RelatedLexicalUnits.Count() > 0 && x.RelatedLexicalUnits[0].RelatedLexicalUnitId == word2.Id && x.RelatedLexicalUnits[0].LexicalUnitId == word1.Id &&
+                x.User.Id == _user.Id));
         }
 
         [Test]
-        public async Task UpdateWordWithRelatedWordsOf_ShouldCallUpdateMethodWithRightArguments()
+        public async Task UpdateWordWithRelatedWordsOf_ShouldBeUpdated()
         {
-            var word1 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word1 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 User = _user
-            });
-            var word2 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            }).Entity;
+            var word2 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #2",
                 User = _user,
-            });
+            }).Entity;
+            _db.SaveChanges();
             word2.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word2, word1) };
-            await _dal.LexicalUnits.Update(word2);
-
-            var word3 = await _dal.LexicalUnits.Add(new LexicalUnit()
-            {
-                Text = "Word #3",
-                User = _user,
-            });
-
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word1.Id))).ReturnsAsync(word1);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word2.Id))).ReturnsAsync(word2);
-            _words.Setup(x => x.Update(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
+            _db.SaveChanges();
 
             var updatedWord = new App.Dto.LexicalUnit()
             {
@@ -213,59 +190,53 @@ namespace SlidEnglish.Web.UnitTests
 
             await _service.UpdateAsync(_user.Id, updatedWord);
 
-            _words.Verify(x => x.Update(
-                It.Is<LexicalUnit>(c =>
-                c.Id == updatedWord.Id &&
-                c.RelatedLexicalUnitsOf != null && c.RelatedLexicalUnitsOf.Count() > 0 && c.RelatedLexicalUnitsOf[0].RelatedLexicalUnitId == word1.Id && c.RelatedLexicalUnitsOf[0].LexicalUnitId == word2.Id &&
-                c.User.Id == _user.Id)), Times.Exactly(1));
+            Assert.NotNull(_db.LexicalUnits.FirstOrDefault(x =>
+                x.Id == updatedWord.Id &&
+                x.RelatedLexicalUnitsOf != null && x.RelatedLexicalUnitsOf.Count() > 0 && x.RelatedLexicalUnitsOf[0].RelatedLexicalUnitId == word1.Id && x.RelatedLexicalUnitsOf[0].LexicalUnitId == word2.Id &&
+                x.User.Id == _user.Id));
         }
 
         [Test]
-        public async Task UpdateWordWithComplexRelatedWords_ShouldCallUpdateMethodWithRightArguments()
+        public async Task UpdateWordWithComplexRelatedWords_ShouldBeUpdated()
         {
-            var word1 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word1 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 User = _user
-            });
-            var word2 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            }).Entity;
+            var word2 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #2",
                 User = _user
-            });
-
+            }).Entity;
+            _db.SaveChanges();
             word1.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word1, word2) };
-            await _dal.LexicalUnits.Update(word1);
+            _db.SaveChanges();
 
-            var word3 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word3 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #3",
                 User = _user,
-            });
+            }).Entity;
+            _db.SaveChanges();
             word3.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word3, word1) };
-            await _dal.LexicalUnits.Update(word3);
+            _db.SaveChanges();
 
-            var word4 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word4 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #4",
                 User = _user,
-            });
+            }).Entity;
+            _db.SaveChanges();
             word4.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>() { new LexicalUnitToLexicalUnitRelation(word4, word1) };
-            await _dal.LexicalUnits.Update(word4);
+            _db.SaveChanges();
 
-            var word5 = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word5 = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #5",
                 User = _user,
-            });
-
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word1.Id))).ReturnsAsync(word1);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word2.Id))).ReturnsAsync(word2);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word3.Id))).ReturnsAsync(word3);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word4.Id))).ReturnsAsync(word4);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.Is<int>(id => id == word5.Id))).ReturnsAsync(word5);
-            _words.Setup(x => x.Update(It.IsAny<LexicalUnit>())).ReturnsAsync(new LexicalUnit());
+            }).Entity;
+            _db.SaveChanges();
 
             var updatedWord = new App.Dto.LexicalUnit()
             {
@@ -278,62 +249,51 @@ namespace SlidEnglish.Web.UnitTests
 
             await _service.UpdateAsync(_user.Id, updatedWord);
 
-            _words.Verify(x => x.Update(
-                It.Is<LexicalUnit>(c =>
-                c.Id == updatedWord.Id &&
-                c.RelatedLexicalUnits != null && c.RelatedLexicalUnits.Count() > 0 && c.RelatedLexicalUnits[0].LexicalUnitId == word1.Id && c.RelatedLexicalUnits[0].RelatedLexicalUnitId == word5.Id &&
-                c.RelatedLexicalUnitsOf != null && c.RelatedLexicalUnitsOf.Count() > 0 && c.RelatedLexicalUnitsOf[0].LexicalUnitId == word3.Id && c.RelatedLexicalUnitsOf[0].RelatedLexicalUnitId == word1.Id &&
-                c.User.Id == _user.Id)), Times.Exactly(1));
+            Assert.NotNull(_db.LexicalUnits.FirstOrDefault(x =>
+                x.Id == updatedWord.Id &&
+                x.RelatedLexicalUnits != null && x.RelatedLexicalUnits.Count() > 0 && x.RelatedLexicalUnits[0].LexicalUnitId == word1.Id && x.RelatedLexicalUnits[0].RelatedLexicalUnitId == word5.Id &&
+                x.RelatedLexicalUnitsOf != null && x.RelatedLexicalUnitsOf.Count() > 0 && x.RelatedLexicalUnitsOf[0].LexicalUnitId == word3.Id && x.RelatedLexicalUnitsOf[0].RelatedLexicalUnitId == word1.Id &&
+                x.User.Id == _user.Id));
         }
 
 
         [Test]
-        public async Task DeleteWord_ShouldCallAddMethodWithRightArguments()
+        public async Task DeleteWord_ShouldBeDeleted()
         {
-            var word = await _dal.LexicalUnits.Add(new LexicalUnit()
+            var word = _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 User = _user
-            });
-
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _words.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(word);
-            _words.Setup(x => x.Delete(It.IsAny<LexicalUnit>())).Returns(Task.CompletedTask);
+            }).Entity;
+            _db.SaveChanges();
 
             await _service.DeleteAsync(_user.Id, word.Id);
 
-            _words.Verify(x => x.Delete(
-                It.Is<LexicalUnit>(c => c.Text == word.Text && word.User.Id == word.User.Id)),
-                Times.Exactly(1));
+            Assert.Null(_db.LexicalUnits.ByUser(_user.Id).FirstOrDefault(x => x.Id == word.Id));
         }
 
         [Test]
-        public async Task GetWords_ShouldCallGetListMethodWithRightArguments()
+        public async Task GetWords_ShouldEmptyList()
         {
-            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.LexicalUnits.ToList());
-
             var result = await _service.GetListAsync(_user.Id);
 
-            _words.Verify(x => x.GetListWithAccessCheck(
-                    It.Is<string>(c => c == _user.Id)),
-                Times.Exactly(1));
+            Assert.IsEmpty(result);
         }
 
         [Test]
         public async Task GetWords_ShouldReturnList()
         {
-            await _dal.LexicalUnits.Add(new LexicalUnit()
+            _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #1",
                 User = _user
             });
-            await _dal.LexicalUnits.Add(new LexicalUnit()
+            _db.LexicalUnits.Add(new LexicalUnit()
             {
                 Text = "Word #2",
                 User = _user
             });
-
-            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.LexicalUnits.ToList());
+            _db.SaveChanges();
 
             var result = await _service.GetListAsync(_user.Id);
 

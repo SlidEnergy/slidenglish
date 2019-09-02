@@ -9,9 +9,9 @@ namespace SlidEnglish.Web
     [ApiController]
     public sealed class TokenController : ControllerBase
     {
-        private readonly TokenService _tokenService;
+        private readonly ITokenService _tokenService;
 
-        public TokenController(TokenService tokenService)
+        public TokenController(ITokenService tokenService)
         {
             _tokenService = tokenService;
         }
@@ -25,7 +25,7 @@ namespace SlidEnglish.Web
 
 				return new Dto.TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken };
             }
-            catch (SecurityTokenException)
+            catch (SecurityTokenException exc)
             {
                 return BadRequest();
             }
