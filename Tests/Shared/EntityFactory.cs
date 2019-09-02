@@ -2,7 +2,7 @@
 using SlidEnglish.Infrastructure;
 using System;
 
-namespace SlidEnglish.Web.UnitTests
+namespace SlidEnglish.Web.Tests
 {
     public class EntityFactory
     {

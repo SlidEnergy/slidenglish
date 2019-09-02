@@ -8,18 +8,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SlidEnglish.App
 {
-	public class TranslateService
-	{
-		private IApplicationDbContext _context;
-		private IMapper _mapper;
+    public class TranslateService : ITranslateService
+    {
+        private IApplicationDbContext _context;
+        private ITranslator _translator;
 
-        public TranslateService(IApplicationDbContext context, IMapper mapper)
-		{
-			_context = context;
-			_mapper = mapper;
+        public TranslateService(IApplicationDbContext context, ITranslator translator)
+        {
+            _context = context;
+            _translator = translator;
         }
 
-        public async Task ProcessTranslate(string userId, string text)
+        public async Task<Dto.TranslateData> ProcessTranslate(string userId, string text)
         {
             var lexicalUnits = Split(text);
 
@@ -37,6 +37,10 @@ namespace SlidEnglish.App
                     await _context.SaveChangesAsync();
                 }
             }
+
+            var translatedText = await _translator.TranslateAsync(text);
+
+            return new Dto.TranslateData { Text = translatedText };
         }
 
         public string[] Split(string text)

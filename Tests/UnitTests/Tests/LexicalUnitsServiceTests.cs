@@ -1,12 +1,11 @@
-﻿using Moq;
-using SlidEnglish.App;
+﻿using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System.Collections.Generic;
+using SlidEnglish.App;
+using SlidEnglish.Domain;
+using SlidEnglish.Web.Tests;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using SlidEnglish.Domain;
-using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace SlidEnglish.Web.UnitTests
 {

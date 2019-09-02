@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SlidEnglish.Web
+namespace SlidEnglish.App.Dto
 {
     public class TranslateData
     {

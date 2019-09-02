@@ -156,9 +156,8 @@ namespace SlidEnglish.Web
 			services.AddIdentityCore<User>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddSingleton<AuthSettings>(x => AuthSettings);
-
-            services.AddSingleton<GoogleCredential>(x => GoogleCredential);
+            services.AddSingleton(x => AuthSettings);
+            services.AddSingleton(x => GoogleCredential);
 
             services.AddSlidEnglishServices();
 		}

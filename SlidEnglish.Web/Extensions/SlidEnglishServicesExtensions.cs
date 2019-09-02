@@ -20,7 +20,9 @@ namespace SlidEnglish.Web
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ILexicalUnitsService, LexicalUnitsService>();
-            services.AddScoped<TranslateService>();
+            services.AddScoped<ITranslateService, TranslateService>();
+
+            services.AddScoped<ITranslator, GoogleTranslator>();
 		}
 	}
 }

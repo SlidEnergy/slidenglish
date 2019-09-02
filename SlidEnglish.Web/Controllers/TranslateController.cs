@@ -4,6 +4,7 @@ using Google.Cloud.Translation.V2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SlidEnglish.App;
+using SlidEnglish.App.Dto;
 using System;
 using System.Threading.Tasks;
 
@@ -14,15 +15,11 @@ namespace SlidEnglish.Web.Controllers
     [ApiController]
     public class TranslateController : ControllerBase
     {
-        private readonly IMapper _mapper;
-        private readonly TranslateService _translateService;
-        private readonly GoogleCredential _googleCredential;
+        private readonly ITranslateService _translateService;
 
-        public TranslateController(IMapper mapper, TranslateService translateService, GoogleCredential googleCredential)
+        public TranslateController(ITranslateService translateService)
         {
-            _mapper = mapper;
             _translateService = translateService;
-            _googleCredential = googleCredential;
         }
 
         [HttpPost]
@@ -31,19 +28,9 @@ namespace SlidEnglish.Web.Controllers
         {
             var userId = User.GetUserId();
 
-            await _translateService.ProcessTranslate(userId, data.Text);
+            var translateData = await _translateService.ProcessTranslate(userId, data.Text);
 
-            try
-            {
-                TranslationClient client = TranslationClient.Create(_googleCredential);
-                var response = await client.TranslateTextAsync(data.Text, "ru", "en");
-
-                return Ok(new TranslateData { Text = response.TranslatedText });
-            }
-            catch(Exception ex)
-            {
-                throw;
-            }
+            return Ok(translateData);
         }
     }
 }
