@@ -120,12 +120,11 @@ namespace SlidEnglish.App
                     if (editLexicalUnit.ExamplesOfUse.Any(x => x.Example == example.Example))
                     {
                         var exampleToUpdate = editLexicalUnit.ExamplesOfUse.First(x => x.Example == example.Example);
-                        exampleToUpdate.Attribute = example.Attribute;
-                        examplesOfUse.Add(exampleToUpdate);
+                        examplesOfUse.Add(_mapper.Map(example, exampleToUpdate));
                     }
                     else
                     {
-                        examplesOfUse.Add(example);
+                        examplesOfUse.Add(_mapper.Map<ExampleOfUse>(example));
                     }
                 }
             }

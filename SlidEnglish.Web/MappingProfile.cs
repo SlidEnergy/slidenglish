@@ -28,13 +28,19 @@ namespace SlidEnglish.Web
                     opt => opt.MapFrom(src => src.Notes ?? ""))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
-			CreateMap<LexicalUnit, App.Dto.LexicalUnit>()
+            CreateMap<LexicalUnit, App.Dto.LexicalUnit>()
                 .ForMember(dest => dest.RelatedLexicalUnits,
-					opt => opt.MapFrom(src => src.AllRelatedLexicalUnits.Select(x => new LexicalUnitRelation(x.LexicalUnit, x.Attribute)).ToArray()));
+                    opt => opt.MapFrom(src => src.AllRelatedLexicalUnits.Select(x => new LexicalUnitRelation(x.LexicalUnit, x.Attribute)).ToArray()));
+
 
             CreateMap<LexicalUnitRelation, App.Dto.LexicalUnitRelation>()
                 .ForMember(dest => dest.LexicalUnitId,
                     opt => opt.MapFrom(src => src.LexicalUnit.Id));
+
+            CreateMap<ExampleOfUse, App.Dto.ExampleOfUse>();
+            CreateMap<App.Dto.ExampleOfUse, ExampleOfUse>()
+                .ForMember(dest => dest.LexicalUnitId, opt => opt.Ignore())
+                .ForMember(dest => dest.LexicalUnit, opt => opt.Ignore());
         }
     }
 }

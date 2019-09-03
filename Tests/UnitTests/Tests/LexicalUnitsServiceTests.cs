@@ -48,7 +48,7 @@ namespace SlidEnglish.Web.UnitTests
             var word = new App.Dto.LexicalUnit()
             {
                 Text = "Word #1",
-                ExamplesOfUse = new[] { new ExampleOfUse { Example = "Sentence #1" } }
+                ExamplesOfUse = new[] { new App.Dto.ExampleOfUse { Example = "Sentence #1" } }
             };
 
             await _service.AddAsync(_user.Id, word);
@@ -114,7 +114,10 @@ namespace SlidEnglish.Web.UnitTests
             var updatedWord = new App.Dto.LexicalUnit()
             {
                 Id = word.Id,
-                ExamplesOfUse = new[] { new ExampleOfUse { Example = "Sentence #1" }, new ExampleOfUse { Example = "Sentence #3" } },
+                ExamplesOfUse = new[] {
+                    new App.Dto.ExampleOfUse { Example = "Sentence #1" },
+                    new App.Dto.ExampleOfUse { Example = "Sentence #3" }
+                },
             };
 
             var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
