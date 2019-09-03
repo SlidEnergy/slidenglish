@@ -13,12 +13,13 @@
 
 		public LexicalUnitToLexicalUnitRelation() { }
 
-		public LexicalUnitToLexicalUnitRelation(LexicalUnit lexicalUnit, LexicalUnit relatedLecicalUnit)
+		public LexicalUnitToLexicalUnitRelation(LexicalUnit lexicalUnit, LexicalUnit relatedLecicalUnit, RelationAttribute attribute = RelationAttribute.None)
 		{
 			LexicalUnitId = lexicalUnit.Id;
 			LexicalUnit = lexicalUnit;
 			RelatedLexicalUnitId = relatedLecicalUnit.Id;
 			LexicalUnit = relatedLecicalUnit;
+            Attribute = attribute;
 		}
 	}
 }

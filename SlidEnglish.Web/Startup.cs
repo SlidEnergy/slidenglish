@@ -121,7 +121,12 @@ namespace SlidEnglish.Web
 			}).CreateMapper());
 
 			services.AddCors();
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+			services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
 			services.AddEntityFrameworkNpgsql()
 				.AddDbContext<ApplicationDbContext>(options => options

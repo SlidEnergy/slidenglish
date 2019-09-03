@@ -25,7 +25,6 @@ namespace SlidEnglish.App
 
             var newLexicalUnit = _mapper.Map<LexicalUnit>(dto);
 
-            //newLexicalUnit.User = await _dal.Users.GetById(userId);
             newLexicalUnit.User = await _context.Users.FindAsync(userId);
             newLexicalUnit.InputAttributes = LexicalUnitInputAttribute.UserInput;
 
@@ -33,7 +32,6 @@ namespace SlidEnglish.App
                 await AddRelatedLexicalUnits(userId, newLexicalUnit, dto);
 
             _context.LexicalUnits.Add(newLexicalUnit);
-            //await _dal.LexicalUnits.Add(newLexicalUnit);
 
             await _context.SaveChangesAsync();
             return _mapper.Map<Dto.LexicalUnit>(newLexicalUnit);
@@ -45,7 +43,6 @@ namespace SlidEnglish.App
 
             foreach (var relation in dto.RelatedLexicalUnits)
             {
-                //var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
                 var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FindAsync(relation.LexicalUnitId);
                 newLexicalUnit.RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(newLexicalUnit, linkedLexicalUnit));
             }
@@ -62,15 +59,13 @@ namespace SlidEnglish.App
         {
             var dto = lexicalUnit;
 
-            //var editLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, dto.Id);
-            var editLexicalUnit = await _context.LexicalUnits.FirstAsync(x => x.User.Id == userId && x.Id == dto.Id);
+            var editLexicalUnit = await _context.LexicalUnits.ByUser(userId).FindAsync(dto.Id);
 
-            _mapper.Map<Dto.LexicalUnit, LexicalUnit>(dto, editLexicalUnit);
+            _mapper.Map(dto, editLexicalUnit);
 
             await UpdateRelatedLexicalUnits(userId, editLexicalUnit, dto);
             UpdateExamplesOfUse(editLexicalUnit, dto);
 
-            //await _dal.LexicalUnits.Update(editLexicalUnit);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<Dto.LexicalUnit>(editLexicalUnit);
@@ -95,13 +90,13 @@ namespace SlidEnglish.App
                     {
                         //var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
                         var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FirstAsync(x => x.Id == relation.LexicalUnitId);
-                        relatedLexicalUnitsOf.Add(new LexicalUnitToLexicalUnitRelation(linkedLexicalUnit, editLexicalUnit));
+                        relatedLexicalUnitsOf.Add(new LexicalUnitToLexicalUnitRelation(linkedLexicalUnit, editLexicalUnit, relation.Attribute));
                     }
                     else
                     {
                         //var linkedLexicalUnit = await _dal.LexicalUnits.GetByIdWithAccessCheck(userId, relation.LexicalUnitId);
                         var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FirstAsync(x => x.Id == relation.LexicalUnitId);
-                        relatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(editLexicalUnit, linkedLexicalUnit));
+                        relatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(editLexicalUnit, linkedLexicalUnit, relation.Attribute));
                     }
                 }
             }
@@ -124,7 +119,9 @@ namespace SlidEnglish.App
                 {
                     if (editLexicalUnit.ExamplesOfUse.Any(x => x.Example == example.Example))
                     {
-                        examplesOfUse.Add(_mapper.Map(example, editLexicalUnit.ExamplesOfUse.First(x => x.Example == example.Example)));
+                        var exampleToUpdate = editLexicalUnit.ExamplesOfUse.First(x => x.Example == example.Example);
+                        exampleToUpdate.Attribute = example.Attribute;
+                        examplesOfUse.Add(exampleToUpdate);
                     }
                     else
                     {

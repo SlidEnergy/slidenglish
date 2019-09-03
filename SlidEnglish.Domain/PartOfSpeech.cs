@@ -36,5 +36,10 @@
         /// Артикль
         /// </summary>
         Article = 6,
+
+        /// <summary>
+        /// Частица
+        /// </summary>
+        Particle = 7,
     }
 }

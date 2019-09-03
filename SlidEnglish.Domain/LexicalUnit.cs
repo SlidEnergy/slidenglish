@@ -41,23 +41,31 @@ namespace SlidEnglish.Domain
 
         [NotMapped]
 		public ICollection<LexicalUnitRelation> AllRelatedLexicalUnits => RelatedLexicalUnits
-            .Select(x => new LexicalUnitRelation(x.LexicalUnit, x.Attribute))
+            .Select(x => new LexicalUnitRelation(x.RelatedLexicalUnit, x.Attribute))
             .Union(RelatedLexicalUnitsOf.Select(x => new LexicalUnitRelation(x.LexicalUnit, x.Attribute))).ToList();
 
 		public bool IsBelongsTo(string userId) => User.Id == userId;
 
         public bool IsWord => PartOfSpeech == PartOfSpeech.Noun || PartOfSpeech == PartOfSpeech.Verb || PartOfSpeech == PartOfSpeech.Adjective;
 
-        public bool IsPhrase => Text.Split(' ').Length > 1;
+        public bool IsPhrase => AsArray().Length > (StartWithArticleOrParticle ? 2 : 1);
+
+        public string[] AsArray() => Text.Split(' ');
+
+        public bool StartWithArticleOrParticle => AsArray().Length > 1 &&
+            LexicalUnitDescriptor.All
+            .Where(x => x.PartOfSpeech == PartOfSpeech.Article || x.PartOfSpeech == PartOfSpeech.Particle)
+            .Select(x => x.Text)
+            .Contains(AsArray()[0]);
 
         public LexicalUnit() { }
 
-        public void AddRelatedLexicalUnit(LexicalUnit relatedLexicalUnit)
+        public void AddRelatedLexicalUnit(LexicalUnit relatedLexicalUnit, RelationAttribute attribute = RelationAttribute.None)
         {
             if (Id <= 0)
                 throw new InvalidOperationException();
 
-            RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(this, relatedLexicalUnit));
+            RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(this, relatedLexicalUnit, attribute));
         }
 	}
 }

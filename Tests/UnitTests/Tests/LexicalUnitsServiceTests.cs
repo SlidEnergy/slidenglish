@@ -127,16 +127,37 @@ namespace SlidEnglish.Web.UnitTests
         }
 
         [Test]
-        public async Task UpdateWordWithDirectRelatedWords_ShouldBeUpdated()
+        public async Task UpdateWordWithSynonym_ShouldBeUpdated()
         {
             var word1 = _factory.CreateLexicalUnit(_user);
             var word2 = _factory.CreateLexicalUnit(_user);
-            var word3 = _factory.CreateLexicalUnit(_user);
 
             var updatedWord = new App.Dto.LexicalUnit()
             {
                 Id = word1.Id,
-                RelatedLexicalUnits = new App.Dto.LexicalUnitRelation[] { new App.Dto.LexicalUnitRelation() { LexicalUnitId = word2.Id } }
+                RelatedLexicalUnits = new [] { new App.Dto.LexicalUnitRelation() { LexicalUnitId = word2.Id, Attribute = RelationAttribute.Synonym } }
+            };
+
+            var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
+
+            Assert.NotNull(_db.LexicalUnits.FirstOrDefault(x =>
+                x.Id == updatedWord.Id &&
+                x.RelatedLexicalUnits != null && x.RelatedLexicalUnits.Count() > 0 && 
+                x.RelatedLexicalUnits[0].RelatedLexicalUnitId == word2.Id && x.RelatedLexicalUnits[0].LexicalUnitId == word1.Id &&
+                x.RelatedLexicalUnits[0].Attribute == RelationAttribute.Synonym &&
+                x.User.Id == _user.Id));
+        }
+
+        [Test]
+        public async Task UpdateWordWithDirectRelatedWords_ShouldBeUpdated()
+        {
+            var word1 = _factory.CreateLexicalUnit(_user);
+            var word2 = _factory.CreateLexicalUnit(_user);
+
+            var updatedWord = new App.Dto.LexicalUnit()
+            {
+                Id = word1.Id,
+                RelatedLexicalUnits = new [] { new App.Dto.LexicalUnitRelation() { LexicalUnitId = word2.Id } }
             };
 
             var category1 = await _service.UpdateAsync(_user.Id, updatedWord);
@@ -215,6 +236,33 @@ namespace SlidEnglish.Web.UnitTests
         }
 
         [Test]
+        public async Task DeleteWordWithRelatedLexicalUnit_ShouldBeDeleted()
+        {
+            var word1 = _factory.CreateLexicalUnit(_user);
+            var word2 = _factory.CreateLexicalUnit(_user);
+            word2.AddRelatedLexicalUnit(word1);
+            _db.SaveChanges();
+
+            await _service.DeleteAsync(_user.Id, word1.Id);
+            await _service.DeleteAsync(_user.Id, word2.Id);
+
+            Assert.Null(_db.LexicalUnits.ByUser(_user.Id).FirstOrDefault(x => x.Id == word1.Id));
+            Assert.Null(_db.LexicalUnits.ByUser(_user.Id).FirstOrDefault(x => x.Id == word2.Id));
+        }
+
+        [Test]
+        public async Task DeleteWordWithExamplesOfUse_ShouldBeDeleted()
+        {
+            var word = _factory.CreateLexicalUnit(_user);
+            word.ExamplesOfUse.Add(new ExampleOfUse { Example = "Example" });
+            _db.SaveChanges();
+
+            await _service.DeleteAsync(_user.Id, word.Id);
+
+            Assert.Null(_db.LexicalUnits.ByUser(_user.Id).FirstOrDefault(x => x.Id == word.Id));
+        }
+
+        [Test]
         public async Task GetWords_ShouldEmptyList()
         {
             var result = await _service.GetListAsync(_user.Id);
@@ -225,8 +273,10 @@ namespace SlidEnglish.Web.UnitTests
         [Test]
         public async Task GetWords_ShouldReturnList()
         {
-            _factory.CreateLexicalUnit(_user);
-            _factory.CreateLexicalUnit(_user);
+            var word1 = _factory.CreateLexicalUnit(_user);
+            var word2 = _factory.CreateLexicalUnit(_user);
+            word2.RelatedLexicalUnits = new[] { new LexicalUnitToLexicalUnitRelation(word2, word1) };
+            _db.SaveChanges();
 
             var result = await _service.GetListAsync(_user.Id);
 
