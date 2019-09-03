@@ -32,6 +32,15 @@ namespace SlidEnglish.Infrastructure
                 .HasOne(e => e.LexicalUnit)
                 .WithMany(e => e.RelatedLexicalUnits)
                 .HasForeignKey(e => e.LexicalUnitId);
+
+            modelBuilder.Entity<ExampleOfUse>()
+                .HasKey(key => new { key.Example, key.LexicalUnitId });
+
+            modelBuilder.Entity<LexicalUnit>()
+                .HasMany(x => x.ExamplesOfUse)
+                .WithOne(x => x.LexicalUnit)
+                .HasForeignKey(x => x.LexicalUnitId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public DbSet<LexicalUnit> LexicalUnits { get; set; }

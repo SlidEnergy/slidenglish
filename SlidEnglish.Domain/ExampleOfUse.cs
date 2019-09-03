@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SlidEnglish.Domain
 {
-    public class ExampleOfUse: IUniqueObject
+    public class ExampleOfUse
     {
-        public int Id { get; set; }
+        public int LexicalUnitId { get; set; }
+        public virtual LexicalUnit LexicalUnit { get; set; }
 
         [Required]
         public string Example { get; set; }
