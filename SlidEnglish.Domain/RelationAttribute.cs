@@ -19,6 +19,11 @@ namespace SlidEnglish.Domain
         /// <summary>
         /// Однокоренное
         /// </summary>
-        RootWord = 2
+        RootWord = 2,
+
+        /// <summary>
+        /// Одна из форм глагола
+        /// </summary>
+        VerbForm = 3
     }
 }

@@ -13,9 +13,9 @@ namespace SlidEnglish.Web
     public class UsersController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly UsersService _usersService;
+        private readonly IUsersService _usersService;
 
-        public UsersController(IMapper mapper, UsersService usersService)
+        public UsersController(IMapper mapper, IUsersService usersService)
         {
             _mapper = mapper;
             _usersService = usersService;

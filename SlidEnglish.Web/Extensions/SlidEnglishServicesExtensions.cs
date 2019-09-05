@@ -13,18 +13,16 @@ namespace SlidEnglish.Web
 	{
 		public static void AddSlidEnglishServices(this IServiceCollection services)
 		{
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
+
             services.AddScoped<ITokenGenerator, TokenGenerator>();
 
-            services.AddScoped<IRepository<User, string>, EfRepository<User, string>>();
-			services.AddScoped<ILexicalUnitsRepository, EfLexicalUnitsRepository>();
-            services.AddScoped<IRefreshTokensRepository, EfRefreshTokensRepository>();
+            services.AddScoped<IUsersService, UsersService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ILexicalUnitsService, LexicalUnitsService>();
+            services.AddScoped<ITranslateService, TranslateService>();
 
-            services.AddScoped<UsersService>();
-            services.AddScoped<TokenService>();
-            services.AddScoped<LexicalUnitsService>();
-            services.AddScoped<TranslateService>();
-
-            services.AddScoped<IDataAccessLayer, DataAccessLayer>();
+            services.AddScoped<ITranslator, GoogleTranslator>();
 		}
 	}
 }

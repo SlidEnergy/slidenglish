@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\EntityFactory.cs" Link="EntityFactory.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\..\SlidEnglish.App\SlidEnglish.App.csproj" />
     <ProjectReference Include="..\..\SlidEnglish.Domain\SlidEnglish.Domain.csproj" />
     <ProjectReference Include="..\..\SlidEnglish.Infrastructure\SlidEnglish.Infrastructure.csproj" />

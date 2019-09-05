@@ -121,7 +121,12 @@ namespace SlidEnglish.Web
 			}).CreateMapper());
 
 			services.AddCors();
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+			services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
 			services.AddEntityFrameworkNpgsql()
 				.AddDbContext<ApplicationDbContext>(options => options
@@ -156,9 +161,8 @@ namespace SlidEnglish.Web
 			services.AddIdentityCore<User>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddSingleton<AuthSettings>(x => AuthSettings);
-
-            services.AddSingleton<GoogleCredential>(x => GoogleCredential);
+            services.AddSingleton(x => AuthSettings);
+            services.AddSingleton(x => GoogleCredential);
 
             services.AddSlidEnglishServices();
 		}

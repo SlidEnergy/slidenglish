@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SlidEnglish.Domain;
+using SlidEnglish.Web.Tests;
 using System.Threading.Tasks;
 
 namespace SlidEnglish.Web.IntegrationTests
@@ -7,15 +8,21 @@ namespace SlidEnglish.Web.IntegrationTests
 	[TestFixture]
 	public class LexicalUnitsTest : ControllerTestBase
 	{
-		[Test]
+        private EntityFactory _entityFactory;
+
+        [SetUp]
+        public void Setup()
+        {
+            _entityFactory = new EntityFactory(_db);
+        }
+
+        [Test]
 		public async Task GetWordsList_ShouldReturnContent()
 		{
-			var word1 = new LexicalUnit() { Text = "Word #1", User = _user };
-            await _dal.LexicalUnits.Add(word1);
-			var word2 = new LexicalUnit() { Text = "Word #2", User = _user };
-            await _dal.LexicalUnits.Add(word2);
+            _entityFactory.CreateLexicalUnit(_user);
+			_entityFactory.CreateLexicalUnit(_user);
 
-			var request = CreateAuthJsonRequest("GET", "/api/v1/lexicalunits/");
+            var request = CreateAuthJsonRequest("GET", "/api/v1/lexicalunits/");
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -39,10 +46,9 @@ namespace SlidEnglish.Web.IntegrationTests
 		[Test]
 		public async Task UpdateWord_ShouldReturnContent()
 		{
-			var word = new LexicalUnit() { Text = "Word #1", User = _user };
-			await _dal.LexicalUnits.Add(word);
+			var word = _entityFactory.CreateLexicalUnit(_user);
 
-			var request = CreateAuthJsonRequest("PUT", "/api/v1/lexicalunits/" + word.Id, new App.Dto.LexicalUnit
+            var request = CreateAuthJsonRequest("PUT", "/api/v1/lexicalunits/" + word.Id, new App.Dto.LexicalUnit
 			{
 				Id = word.Id,
 				Text = "Word #2",
@@ -60,10 +66,9 @@ namespace SlidEnglish.Web.IntegrationTests
 		[Test]
 		public async Task DeleteWord_ShouldNoContent()
 		{
-			var word = new LexicalUnit() { Text = "Word #1", User = _user };
-			await _dal.LexicalUnits.Add(word);
+			var word = _entityFactory.CreateLexicalUnit(_user);
 
-			var request = CreateAuthJsonRequest("DELETE", "/api/v1/lexicalunits/" + word.Id);
+            var request = CreateAuthJsonRequest("DELETE", "/api/v1/lexicalunits/" + word.Id);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);

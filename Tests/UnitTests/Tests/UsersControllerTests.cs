@@ -21,8 +21,8 @@ namespace SlidEnglish.Web.UnitTests
             var store = new Mock<IUserStore<User>>();
 
             _manager = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new TokenService(_mockedDal.RefreshTokens, tokenGenerator, authSettings);
-            var service = new UsersService(_manager.Object, tokenGenerator, tokenService);
+			var tokenService = new Mock<ITokenService>();
+            var service = new UsersService(_manager.Object, tokenGenerator, tokenService.Object);
 
 	        _controller = new UsersController(_autoMapper.Create(_db), service);
 			_controller.AddControllerContext(_user);

@@ -11,44 +11,55 @@ namespace SlidEnglish.Web.UnitTests
     public class LexicalUnitsControllerTests : TestsBase
     {
 		private LexicalUnitsController _controller;
+        private Mock<ILexicalUnitsService> _service;
 
 		[SetUp]
         public void Setup()
         {
-            var service = new LexicalUnitsService(_mockedDal, _autoMapper.Create(_db));
-			_controller = new LexicalUnitsController(_autoMapper.Create(_db), service);
+            _service = new Mock<ILexicalUnitsService>();
+            
+			_controller = new LexicalUnitsController(_autoMapper.Create(_db), _service.Object);
 			_controller.AddControllerContext(_user);
 		}
 
         [Test]
-        public async Task GetWords_ShouldReturnList()
+        public async Task GetWords_ShouldCallMethod()
         {
-            await _dal.LexicalUnits.Add(new LexicalUnit()
-            {
-                Text = "Word #1",
-                User = _user
-            });
-            await _dal.LexicalUnits.Add(new LexicalUnit()
-            {
-                Text = "Word #2",
-                User = _user
-            });
-
-            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.LexicalUnits.ToList());
+            _service.Setup(x => x.GetListAsync(It.IsAny<string>())).ReturnsAsync(new App.Dto.LexicalUnit[] { });
 
             var result = await _controller.GetList();
 
-            Assert.AreEqual(2, result.Value.Count());
+            _service.Verify(x => x.GetListAsync(It.Is<string>(a => a == _user.Id)));
         }
 
         [Test]
-        public async Task GetEmptyWordsList_ShouldBeEmptyListReturned()
+        public async Task AddWords_ShouldCallMethod()
         {
-            _words.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.LexicalUnits.ToList());
+            _service.Setup(x => x.AddAsync(It.IsAny<string>(), It.IsAny<App.Dto.LexicalUnit>())).ReturnsAsync(new App.Dto.LexicalUnit { });
 
-            var result = await _controller.GetList();
+            var result = await _controller.Add(new App.Dto.LexicalUnit { Id = 1 });
 
-            Assert.AreEqual(0, result.Value.Count());
+            _service.Verify(x => x.AddAsync(It.Is<string>(a => a == _user.Id), It.Is<App.Dto.LexicalUnit>(a => a.Id == 1)));
+        }
+
+        [Test]
+        public async Task UpdateWords_ShouldCallMethod()
+        {
+            _service.Setup(x => x.UpdateAsync(It.IsAny<string>(), It.IsAny<App.Dto.LexicalUnit>())).ReturnsAsync(new App.Dto.LexicalUnit { });
+
+            var result = await _controller.Update(1, new App.Dto.LexicalUnit { Id = 1 });
+
+            _service.Verify(x => x.UpdateAsync(It.Is<string>(a => a == _user.Id), It.Is<App.Dto.LexicalUnit>(a => a.Id == 1)));
+        }
+
+        [Test]
+        public async Task DeleteWords_ShouldCallMethod()
+        {
+            _service.Setup(x => x.DeleteAsync(It.IsAny<string>(), It.IsAny<int>())).Returns(Task.CompletedTask);
+
+            var result = await _controller.Delete(1);
+
+            _service.Verify(x => x.DeleteAsync(It.Is<string>(a => a == _user.Id), It.Is<int>(a => a == 1)), Times.Once);
         }
     }
 }

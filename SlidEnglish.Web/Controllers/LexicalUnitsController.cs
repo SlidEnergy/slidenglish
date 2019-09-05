@@ -13,9 +13,9 @@ namespace SlidEnglish.Web
     public class LexicalUnitsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly LexicalUnitsService _lexicalUnitsService;
+        private readonly ILexicalUnitsService _lexicalUnitsService;
 
-        public LexicalUnitsController(IMapper mapper, LexicalUnitsService lexicalUnitsService)
+        public LexicalUnitsController(IMapper mapper, ILexicalUnitsService lexicalUnitsService)
         {
             _mapper = mapper;
             _lexicalUnitsService = lexicalUnitsService;

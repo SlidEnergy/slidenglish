@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SlidEnglish.Domain;
+using System;
+using System.Linq;
 
 namespace SlidEnglish.Web.IntegrationTests
 {
@@ -18,10 +20,11 @@ namespace SlidEnglish.Web.IntegrationTests
 		protected WebApiApplicationFactory<Startup> _factory;
 		protected HttpClient _client;
 		protected string _accessToken;
-		protected ApplicationDbContext _db;
+        protected string _refreshToken;
+
+        protected ApplicationDbContext _db;
 		protected UserManager<User> _manager;
 		protected User _user;
-		protected DataAccessLayer _dal;
 
 		[OneTimeSetUp]
 		public async Task HttpClientSetup()
@@ -38,16 +41,12 @@ namespace SlidEnglish.Web.IntegrationTests
 			Assert.NotNull(_db);
 			Assert.NotNull(_manager);
 			
-			_dal = new DataAccessLayer(
-                _db,
-                new EfRepository<User, string>(_db),
-                new EfLexicalUnitsRepository(_db),
-				new EfRefreshTokensRepository(_db));
-
 			_user = new User() { Email = "test1@email.com", UserName = "test1@email.com" };
 			var result = await _manager.CreateAsync(_user, "Password123#");
-			Assert.IsTrue(result.Succeeded);
-			await Login();
+            if (!result.Succeeded)
+                throw new Exception(string.Join(" ,", result.Errors.Select(x => x.Description).ToList()));
+
+            await Login();
 		}
 
 		protected virtual async Task Login()
@@ -56,12 +55,19 @@ namespace SlidEnglish.Web.IntegrationTests
 				new { Email = "test1@email.com", Password = "Password123#", ConfirmPassword = "Password123#" });
 			var response = await SendRequest(request);
 
-			Assert.IsTrue(response.IsSuccessStatusCode);
+            if (!response.IsSuccessStatusCode)
+                throw new Exception(response.ReasonPhrase);
+			
 			var dict = await response.ToDictionary();
 
-			Assert.IsTrue(dict.ContainsKey("token"));
+            if (!dict.ContainsKey("token"))
+                throw new Exception("Token didn't got generated");
+			
 			_accessToken = (string)dict["token"];
-			Assert.IsTrue(_accessToken.Length > 32);
+            _refreshToken = (string)dict["refreshToken"];
+
+            if (_accessToken.Length <= 32)
+                throw new Exception("Invalid auth token");
 		}
 
 		protected virtual HttpRequestMessage CreateAuthJsonRequest(string method, string url, object content = null)
