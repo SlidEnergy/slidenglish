@@ -1,44 +1,26 @@
-﻿using AutoMapper;
+﻿using Microsoft.EntityFrameworkCore;
 using SlidEnglish.Domain;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace SlidEnglish.App
 {
-    public class TranslateService : ITranslateService
+    public class ImportService : IImportService
     {
         private IApplicationDbContext _context;
-        private ITranslator _translator;
 
-        public TranslateService(IApplicationDbContext context, ITranslator translator)
+        public ImportService(IApplicationDbContext context)
         {
             _context = context;
-            _translator = translator;
         }
 
-        public async Task<Dto.TranslateData> ProcessTranslate(string userId, string text)
+        public async Task ImportMultiple(string userId, string text)
         {
-            var lexicalUnits = Split(text);
+            var lexicalUnits = text.Split('\n');
 
             foreach (var lexicalUnit in lexicalUnits)
             {
                 await ImportSingle(userId, lexicalUnit);
             }
-
-            var translatedText = await _translator.TranslateAsync(text);
-
-            return new Dto.TranslateData { Text = translatedText };
-        }
-
-        private string[] Split(string text)
-        {
-            var punctuation = text.Where(Char.IsPunctuation).Distinct().ToArray();
-            var lexicalUnits = text.Split().Select(x => x.Trim(punctuation)).ToArray();
-
-            return lexicalUnits.Length > 2 ? lexicalUnits : new string[] { text };
         }
 
         public async Task ImportSingle(string userId, string lexicalUnit)
@@ -64,7 +46,7 @@ namespace SlidEnglish.App
             {
                 Text = lexicalUnit,
                 User = await _context.Users.FindAsync(userId),
-                InputAttributes = LexicalUnitInputAttribute.TranslateInput
+                InputAttributes = LexicalUnitInputAttribute.UserInput
             };
 
             _context.LexicalUnits.Add(newLexicalUnit);

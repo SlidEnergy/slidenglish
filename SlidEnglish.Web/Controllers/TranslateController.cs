@@ -8,7 +8,7 @@ using SlidEnglish.App.Dto;
 using System;
 using System.Threading.Tasks;
 
-namespace SlidEnglish.Web.Controllers
+namespace SlidEnglish.Web
 {
     [Authorize]
     [Route("api/v1/[controller]")]

@@ -21,6 +21,7 @@ namespace SlidEnglish.Web
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ILexicalUnitsService, LexicalUnitsService>();
             services.AddScoped<ITranslateService, TranslateService>();
+            services.AddScoped<IImportService, ImportService>();
 
             services.AddScoped<ITranslator, GoogleTranslator>();
 		}

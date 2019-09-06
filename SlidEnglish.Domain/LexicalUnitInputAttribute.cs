@@ -16,6 +16,6 @@ namespace SlidEnglish.Domain
         /// <summary>
         /// Добавлены при переводе
         /// </summary>
-        TranslateInput = 2
+        TranslateInput = 2,
     }
 }
