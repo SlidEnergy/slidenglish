@@ -51,7 +51,12 @@ namespace SlidEnglish.Web.UnitTests
                 ExamplesOfUse = new[] { new App.Dto.ExampleOfUse { Example = "Sentence #1" } }
             };
 
-            await _service.AddAsync(_user.Id, word);
+            var newWord = await _service.AddAsync(_user.Id, word);
+
+            Assert.NotNull(_db.LexicalUnits.FirstOrDefault(x =>
+                x.Id == newWord.Id &&
+                x.ExamplesOfUse != null && x.ExamplesOfUse.Count() == 1 && x.ExamplesOfUse[0].Example == word.ExamplesOfUse[0].Example &&
+                x.User.Id == _user.Id));
         }
 
         [Test]

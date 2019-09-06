@@ -10,7 +10,5 @@ namespace SlidEnglish.App
         Task DeleteAsync(string userId, int id);
         Task<Dto.LexicalUnit[]> GetListAsync(string userId);
         Task<Dto.LexicalUnit> UpdateAsync(string userId, Dto.LexicalUnit lexicalUnit);
-        void UpdateExamplesOfUse(Domain.LexicalUnit editLexicalUnit, Dto.LexicalUnit dto);
-        Task UpdateRelatedLexicalUnits(string userId, Domain.LexicalUnit editLexicalUnit, Dto.LexicalUnit dto);
     }
 }

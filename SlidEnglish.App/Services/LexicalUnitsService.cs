@@ -28,8 +28,9 @@ namespace SlidEnglish.App
             newLexicalUnit.User = await _context.Users.FindAsync(userId);
             newLexicalUnit.InputAttributes = LexicalUnitInputAttribute.UserInput;
 
-            if (dto.RelatedLexicalUnits != null && dto.RelatedLexicalUnits.Length > 0)
-                await AddRelatedLexicalUnits(userId, newLexicalUnit, dto);
+            
+            await AddRelatedLexicalUnits(userId, newLexicalUnit, dto);
+            AddExamplesOfUse(newLexicalUnit, dto);
 
             _context.LexicalUnits.Add(newLexicalUnit);
 
@@ -39,12 +40,29 @@ namespace SlidEnglish.App
 
         private async Task AddRelatedLexicalUnits(string userId, LexicalUnit newLexicalUnit, Dto.LexicalUnit dto)
         {
-            newLexicalUnit.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>(dto.RelatedLexicalUnits.Length);
+            newLexicalUnit.RelatedLexicalUnits = new List<LexicalUnitToLexicalUnitRelation>(dto.RelatedLexicalUnits != null ? dto.RelatedLexicalUnits.Length : 0);
 
-            foreach (var relation in dto.RelatedLexicalUnits)
+            if (dto.RelatedLexicalUnits != null && dto.RelatedLexicalUnits.Length > 0)
             {
-                var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FindAsync(relation.LexicalUnitId);
-                newLexicalUnit.RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(newLexicalUnit, linkedLexicalUnit));
+                foreach (var relation in dto.RelatedLexicalUnits)
+                {
+                    var linkedLexicalUnit = await _context.LexicalUnits.ByUser(userId).FindAsync(relation.LexicalUnitId);
+                    newLexicalUnit.RelatedLexicalUnits.Add(new LexicalUnitToLexicalUnitRelation(newLexicalUnit, linkedLexicalUnit));
+                }
+            }
+        }
+
+        private void AddExamplesOfUse(LexicalUnit editLexicalUnit, Dto.LexicalUnit dto)
+        {
+            editLexicalUnit.ExamplesOfUse = new List<ExampleOfUse>(dto.ExamplesOfUse != null ? dto.ExamplesOfUse.Length : 0);
+
+            // Обновляем список связанных синонимов
+            if (dto.ExamplesOfUse != null && dto.ExamplesOfUse.Length > 0)
+            {
+                foreach (var example in dto.ExamplesOfUse)
+                {
+                    editLexicalUnit.ExamplesOfUse.Add(_mapper.Map<ExampleOfUse>(example));
+                }
             }
         }
 
@@ -71,7 +89,7 @@ namespace SlidEnglish.App
             return _mapper.Map<Dto.LexicalUnit>(editLexicalUnit);
         }
 
-        public async Task UpdateRelatedLexicalUnits(string userId, LexicalUnit editLexicalUnit, Dto.LexicalUnit dto)
+        private async Task UpdateRelatedLexicalUnits(string userId, LexicalUnit editLexicalUnit, Dto.LexicalUnit dto)
         {
             // вызываем чтобы сработал lazyloading, это позволит потом сохранить это свойство
             var oldRelatedLexicalUnits = editLexicalUnit.RelatedLexicalUnits;
@@ -105,7 +123,7 @@ namespace SlidEnglish.App
             editLexicalUnit.RelatedLexicalUnitsOf = relatedLexicalUnitsOf;
         }
 
-        public void UpdateExamplesOfUse(LexicalUnit editLexicalUnit, Dto.LexicalUnit dto)
+        private void UpdateExamplesOfUse(LexicalUnit editLexicalUnit, Dto.LexicalUnit dto)
         {
             // вызываем чтобы сработал lazyloading, это позволит потом сохранить это свойство
             var oldExamplesOfUse = editLexicalUnit.ExamplesOfUse;
