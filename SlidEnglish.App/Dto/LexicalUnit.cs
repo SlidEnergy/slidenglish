@@ -24,6 +24,8 @@ namespace SlidEnglish.App.Dto
 
         public ExampleOfUse[] ExamplesOfUse { get; set; }
 
+        public string Translation { get; set; }
+
         public bool IsWord { get; set; }
 
         public bool IsPhrase { get; set; }

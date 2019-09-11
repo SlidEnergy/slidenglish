@@ -39,6 +39,9 @@ namespace SlidEnglish.Domain
 
         public virtual IList<ExampleOfUse> ExamplesOfUse { get; set; } = new List<ExampleOfUse>();
 
+        [Required(AllowEmptyStrings = true)]
+        public string Translation { get; set; } = "";
+
         [NotMapped]
 		public ICollection<LexicalUnitRelation> AllRelatedLexicalUnits => RelatedLexicalUnits
             .Select(x => new LexicalUnitRelation(x.RelatedLexicalUnit, x.Attribute))
@@ -50,8 +53,6 @@ namespace SlidEnglish.Domain
 
         public bool IsPhrase => AsArray().Length > (StartWithArticleOrParticle ? 2 : 1);
 
-        public string[] AsArray() => Text.Split(' ');
-
         public bool StartWithArticleOrParticle => AsArray().Length > 1 &&
             LexicalUnitDescriptor.All
             .Where(x => x.PartOfSpeech == PartOfSpeech.Article || x.PartOfSpeech == PartOfSpeech.Particle)
@@ -59,6 +60,8 @@ namespace SlidEnglish.Domain
             .Contains(AsArray()[0]);
 
         public LexicalUnit() { }
+
+        private string[] AsArray() => Text.Split(' ');
 
         public void AddRelatedLexicalUnit(LexicalUnit relatedLexicalUnit, RelationAttribute attribute = RelationAttribute.None)
         {

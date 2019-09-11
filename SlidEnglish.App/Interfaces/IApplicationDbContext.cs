@@ -11,6 +11,6 @@ namespace SlidEnglish.App
         DbSet<RefreshToken> RefreshTokens { get; set; }
         DbSet<User> Users { get; set; }
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

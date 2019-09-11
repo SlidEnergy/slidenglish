@@ -28,7 +28,8 @@ namespace SlidEnglish.Web.UnitTests
             {
                 Text = "Word #1",
                 Association = "Association #1",
-                Notes = "Description #1"
+                Notes = "Description #1",
+                Translation = "Translation #1"
             };
 
             var newWord = await _service.AddAsync(_user.Id, word);
@@ -38,6 +39,7 @@ namespace SlidEnglish.Web.UnitTests
                 x.Text == word.Text &&
                 x.Association == word.Association &&
                 x.Notes == word.Notes &&
+                x.Translation == word.Translation &&
                 x.InputAttributes == LexicalUnitInputAttribute.UserInput &&
                 x.User.Id == _user.Id));
         }
@@ -90,6 +92,7 @@ namespace SlidEnglish.Web.UnitTests
                 Text = "Word #2",
                 Association = "Association #2",
                 Notes = "Description #2",
+                Translation = "Translation #2"
             };
 
             await _service.UpdateAsync(_user.Id, updatedWord);
@@ -99,6 +102,7 @@ namespace SlidEnglish.Web.UnitTests
                 x.Text == updatedWord.Text &&
                 x.Association == updatedWord.Association &&
                 x.Notes == updatedWord.Notes &&
+                x.Translation == updatedWord.Translation &&
                 x.User.Id == _user.Id));
         }
 
