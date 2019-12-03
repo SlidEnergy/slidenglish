@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 
-namespace SlidEnglish.App
+namespace SlidEnglish.Web
 {
 	/// <summary>
 	/// Класс расширений для ClaimsPrincipal, содержит методы получения данных из Claims.
