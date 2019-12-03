@@ -23,6 +23,10 @@
     <ProjectReference Include="..\SlidEnglish.Infrastructure\SlidEnglish.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
   <Target Name="PrePublishTarget" AfterTargets="Publish">
     <Exec Command="dotnet ef database update" />
   </Target>
