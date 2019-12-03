@@ -1,4 +1,4 @@
-﻿namespace SlidEnglish.App
+﻿namespace SlidEnglish.Web
 {
     public class TokensCortage
     {

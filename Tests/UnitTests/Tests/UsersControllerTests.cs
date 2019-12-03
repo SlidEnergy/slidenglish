@@ -12,6 +12,8 @@ namespace SlidEnglish.Web.UnitTests
     {
         Mock<UserManager<User>> _manager;
 		private UsersController _controller;
+		private Mock<IUsersService> _usersService;
+		private Mock<ITokenService> _tokenService;
 
 		[SetUp]
         public void Setup()
@@ -21,40 +23,36 @@ namespace SlidEnglish.Web.UnitTests
             var store = new Mock<IUserStore<User>>();
 
             _manager = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new Mock<ITokenService>();
-            var service = new UsersService(_manager.Object, tokenGenerator, tokenService.Object);
+			_tokenService = new Mock<ITokenService>();
+            _usersService = new Mock<IUsersService>();
 
-	        _controller = new UsersController(_autoMapper.Create(_db), service);
+			_controller = new UsersController(_autoMapper.Create(_db), _usersService.Object, _tokenService.Object);
 			_controller.AddControllerContext(_user);
 		}
 
         [Test]
         public async Task GetCurrentUser_ShouldReturnUser()
         {
-            _manager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
+            _usersService.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
 
             var result = await _controller.GetCurrentUser();
 
             Assert.IsInstanceOf<ActionResult<Dto.User>>(result);
 
-            Assert.AreEqual(_user.Id, result.Value.Id);
-            Assert.AreEqual(_user.Email, result.Value.Email);
-        }
+			_usersService.Verify(x => x.GetById(It.Is<string>(u => u == _user.Id)));
+		}
 
         [Test]
         public async Task Login_ShouldReturnTokenAndEmail()
         {
-            _manager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-            _manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
+            _tokenService.Setup(x => x.Login(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new TokensCortage());
 
             var userBindingModel = new LoginBindingModel() { Email = _user.Email, Password = "Password #1" };
 
             var result = await _controller.Login(userBindingModel);
 
-            Assert.NotNull(result.Value.Token);
-            Assert.IsNotEmpty(result.Value.Token);
-            Assert.AreEqual(_user.Email, result.Value.Email);
-        }
+			_tokenService.Verify(x => x.Login(It.Is<string>(e => e == userBindingModel.Email), It.Is<string>(p => p == userBindingModel.Password)));
+		}
 
 		[Test]
 		public async Task Register_ShouldReturnUser()
@@ -62,14 +60,15 @@ namespace SlidEnglish.Web.UnitTests
 			var password = "Password #2";
 			var email = "test2@email.com";
 
-			_manager.Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
+			_usersService.Setup(x => x.Register(It.IsAny<User>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
 
 			var registerBindingModel = new RegisterBindingModel() { Email = email, Password = password, ConfirmPassword = password };
 
 			var result = await _controller.Register(registerBindingModel);
 
 			Assert.NotNull(((CreatedResult)result.Result).Value);
-			Assert.AreEqual(email, ((Dto.User)((CreatedResult)result.Result).Value).Email);
+			_usersService.Setup(x => x.Register(It.Is<User>(u => u.Email == registerBindingModel.Email && u.UserName == registerBindingModel.Email),
+				It.Is<string>(p => p == registerBindingModel.Password)));
 		}
 	}
 }

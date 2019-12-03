@@ -14,11 +14,13 @@ namespace SlidEnglish.Web
     {
         private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
+		private readonly ITokenService _tokenService;
 
-        public UsersController(IMapper mapper, IUsersService usersService)
+		public UsersController(IMapper mapper, IUsersService usersService, ITokenService tokenService)
         {
             _mapper = mapper;
             _usersService = usersService;
+			_tokenService = tokenService;
         }
 
         [HttpGet("current")]
@@ -71,7 +73,7 @@ namespace SlidEnglish.Web
 
             try
             {
-                var tokens = await _usersService.Login(userData.Email, userData.Password);
+                var tokens = await _tokenService.Login(userData.Email, userData.Password);
 
                 return new Dto.TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken, Email = userData.Email };
             }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace SlidEnglish.App
+namespace SlidEnglish.Web
 {
     public interface ITokenGenerator
     {

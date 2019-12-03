@@ -1,24 +1,29 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using SlidEnglish.App;
 using SlidEnglish.Domain;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace SlidEnglish.App
+namespace SlidEnglish.Web
 {
 	public class TokenService : ITokenService
     {
         private readonly ITokenGenerator _tokenGenerator;
         private readonly AuthSettings _authSettings;
 		private readonly IAuthTokenService _service;
+		private readonly UserManager<User> _userManager;
 
-		public TokenService(ITokenGenerator tokenGenerator, AuthSettings authSettings, IAuthTokenService service)
+		public TokenService(ITokenGenerator tokenGenerator, AuthSettings authSettings, IAuthTokenService service, UserManager<User> userManager)
         {
             _tokenGenerator = tokenGenerator;
             _authSettings = authSettings;
 			_service = service;
-        }
+			_userManager = userManager;
+		}
 
         public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
         {
@@ -62,5 +67,27 @@ namespace SlidEnglish.App
 
             return principal;
         }
-    }
+
+		public async Task<TokensCortage> Login(string email, string password)
+		{
+			var user = await _userManager.FindByNameAsync(email);
+
+			if (user == null)
+				throw new AuthenticationException();
+
+			var checkResult = await _userManager.CheckPasswordAsync(user, password);
+
+			if (!checkResult)
+				throw new AuthenticationException();
+
+			var refreshToken = _tokenGenerator.GenerateRefreshToken();
+			await _service.AddToken(user, refreshToken);
+
+			return new TokensCortage()
+			{
+				Token = _tokenGenerator.GenerateAccessToken(user),
+				RefreshToken = refreshToken
+			};
+		}
+	}
 }

@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
-namespace SlidEnglish.App
+namespace SlidEnglish.Web
 {
 	/// <summary>
 	/// Формирует AccessToken и RefreshToken, необходимые для авторизации.

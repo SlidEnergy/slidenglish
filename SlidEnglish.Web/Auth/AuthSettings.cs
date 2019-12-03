@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace SlidEnglish.App
+namespace SlidEnglish.Web
 {
 	/// <summary>
 	/// Параметры для генерации JWT-токена.
