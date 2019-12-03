@@ -19,7 +19,9 @@ namespace SlidEnglish.Web
 
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<ILexicalUnitsService, LexicalUnitsService>();
+			services.AddScoped<IAuthTokenService, AuthTokenService>();
+
+			services.AddScoped<ILexicalUnitsService, LexicalUnitsService>();
             services.AddScoped<ITranslateService, TranslateService>();
             services.AddScoped<IImportService, ImportService>();
 
